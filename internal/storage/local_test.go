@@ -10,7 +10,7 @@ import (
 
 func TestLocalPutGet(t *testing.T) {
 	dir := t.TempDir()
-	drv := NewLocalDriver(dir)
+	drv := NewLocalDriver("test", dir)
 
 	ctx := context.Background()
 	obj := &Object{
@@ -25,7 +25,7 @@ func TestLocalPutGet(t *testing.T) {
 		t.Fatalf("Put: %v", err)
 	}
 
-	if result.Backend != "local" {
+	if result.Backend != "test" {
 		t.Fatalf("expected backend local, got %s", result.Backend)
 	}
 
@@ -55,7 +55,7 @@ func TestLocalPutGet(t *testing.T) {
 
 func TestLocalPutCreatesDateDir(t *testing.T) {
 	dir := t.TempDir()
-	drv := NewLocalDriver(dir)
+	drv := NewLocalDriver("test", dir)
 
 	ctx := context.Background()
 	obj := &Object{
@@ -78,7 +78,7 @@ func TestLocalPutCreatesDateDir(t *testing.T) {
 
 func TestLocalGetNotFound(t *testing.T) {
 	dir := t.TempDir()
-	drv := NewLocalDriver(dir)
+	drv := NewLocalDriver("test", dir)
 
 	ctx := context.Background()
 	_, err := drv.Get(ctx, "nonexistent/20260627/ab/somekey.txt")
@@ -89,7 +89,7 @@ func TestLocalGetNotFound(t *testing.T) {
 
 func TestLocalGetPathTraversal(t *testing.T) {
 	dir := t.TempDir()
-	drv := NewLocalDriver(dir)
+	drv := NewLocalDriver("test", dir)
 
 	ctx := context.Background()
 	_, err := drv.Get(ctx, "../../etc/passwd")
@@ -100,7 +100,7 @@ func TestLocalGetPathTraversal(t *testing.T) {
 
 func TestLocalDelete(t *testing.T) {
 	dir := t.TempDir()
-	drv := NewLocalDriver(dir)
+	drv := NewLocalDriver("test", dir)
 
 	ctx := context.Background()
 	obj := &Object{
@@ -127,7 +127,7 @@ func TestLocalDelete(t *testing.T) {
 
 func TestLocalDeleteNotFound(t *testing.T) {
 	dir := t.TempDir()
-	drv := NewLocalDriver(dir)
+	drv := NewLocalDriver("test", dir)
 	if err := drv.Delete(context.Background(), "nonexistent/file.txt"); err != nil {
 		t.Fatal("delete nonexistent should not error")
 	}
@@ -135,7 +135,7 @@ func TestLocalDeleteNotFound(t *testing.T) {
 
 func TestLocalDeletePathTraversal(t *testing.T) {
 	dir := t.TempDir()
-	drv := NewLocalDriver(dir)
+	drv := NewLocalDriver("test", dir)
 	err := drv.Delete(context.Background(), "../../etc/passwd")
 	if err == nil {
 		t.Fatal("expected error for path traversal")
@@ -144,7 +144,7 @@ func TestLocalDeletePathTraversal(t *testing.T) {
 
 func TestLocalHealth(t *testing.T) {
 	dir := t.TempDir()
-	drv := NewLocalDriver(filepath.Join(dir, "objects"))
+	drv := NewLocalDriver("test", filepath.Join(dir, "objects"))
 
 	if err := drv.Health(context.Background()); err != nil {
 		t.Fatalf("Health: %v", err)
@@ -178,7 +178,7 @@ func TestIsSafePath(t *testing.T) {
 
 func TestLocalPutGetLargeFile(t *testing.T) {
 	dir := t.TempDir()
-	drv := NewLocalDriver(dir)
+	drv := NewLocalDriver("test", dir)
 
 	largeData := make([]byte, 1024*1024)
 	for i := range largeData {

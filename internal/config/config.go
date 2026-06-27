@@ -25,9 +25,10 @@ type Config struct {
 }
 
 type Limits struct {
-	Image SizeBytes `yaml:"image"`
-	Audio SizeBytes `yaml:"audio"`
-	Video SizeBytes `yaml:"video"`
+	Image    SizeBytes `yaml:"image"`
+	Audio    SizeBytes `yaml:"audio"`
+	Video    SizeBytes `yaml:"video"`
+	Document SizeBytes `yaml:"document"`
 }
 
 type SizeBytes int64
@@ -51,7 +52,14 @@ type StorageConfig struct {
 }
 
 type DriverConfig struct {
-	Root string `yaml:"root"`
+	Root            string `yaml:"root,omitempty"`
+	Provider        string `yaml:"provider,omitempty"`
+	Endpoint        string `yaml:"endpoint,omitempty"`
+	Bucket          string `yaml:"bucket,omitempty"`
+	Region          string `yaml:"region,omitempty"`
+	AccessKeyID     string `yaml:"access_key_id,omitempty"`
+	SecretAccessKey string `yaml:"secret_access_key,omitempty"`
+	Secure          *bool  `yaml:"secure,omitempty"`
 }
 
 func Load(path string) (*Config, error) {
@@ -96,12 +104,15 @@ func (c *Config) fillDefaults() error {
 	if c.Limits.Video == 0 {
 		c.Limits.Video = SizeBytes(10 << 20)
 	}
+	if c.Limits.Document == 0 {
+		c.Limits.Document = SizeBytes(2 << 20)
+	}
 	if c.Storage.UploadDriver == "" {
 		c.Storage.UploadDriver = "local"
 	}
 	if c.Storage.Drivers == nil {
 		c.Storage.Drivers = map[string]DriverConfig{
-			"local": {Root: "./data/objects"},
+			"local": {Provider: "local", Root: "./data/objects"},
 		}
 	}
 	if len(c.URLBlake2bSalts) == 0 {

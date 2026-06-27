@@ -9,11 +9,12 @@ import (
 )
 
 type LocalDriver struct {
+	name string
 	root string
 }
 
-func NewLocalDriver(root string) *LocalDriver {
-	return &LocalDriver{root: root}
+func NewLocalDriver(name, root string) *LocalDriver {
+	return &LocalDriver{name: name, root: root}
 }
 
 func (d *LocalDriver) Put(ctx context.Context, obj *Object) (*PutResult, error) {
@@ -30,7 +31,7 @@ func (d *LocalDriver) Put(ctx context.Context, obj *Object) (*PutResult, error) 
 	}
 
 	return &PutResult{
-		Backend:    "local",
+		Backend:    d.name,
 		StorageKey: storageRel,
 	}, nil
 }

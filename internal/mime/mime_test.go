@@ -110,13 +110,41 @@ func TestDetectWAV(t *testing.T) {
 	}
 }
 
-func TestDetectUnsupported(t *testing.T) {
-	_, ok := Detect([]byte("plain text"))
-	if ok {
-		t.Fatal("should not detect plain text")
+func TestDetectTextPlain(t *testing.T) {
+	ti, ok := Detect([]byte("hello world"))
+	if !ok {
+		t.Fatal("should detect text/plain")
 	}
+	if ti.MIME != "text/plain" {
+		t.Fatalf("expected text/plain, got %s", ti.MIME)
+	}
+	if ti.Extension != ".txt" {
+		t.Fatalf("expected .txt, got %s", ti.Extension)
+	}
+	if ti.Category != "document" {
+		t.Fatalf("expected document category, got %s", ti.Category)
+	}
+}
 
-	_, ok = Detect([]byte{0x00, 0x01, 0x02})
+func TestDetectPDF(t *testing.T) {
+	b := []byte("%PDF-1.4 some content")
+	for len(b) < 512 {
+		b = append(b, 0)
+	}
+	ti, ok := Detect(b)
+	if !ok {
+		t.Fatal("should detect application/pdf")
+	}
+	if ti.MIME != "application/pdf" {
+		t.Fatalf("expected application/pdf, got %s", ti.MIME)
+	}
+	if ti.Extension != ".pdf" {
+		t.Fatalf("expected .pdf, got %s", ti.Extension)
+	}
+}
+
+func TestDetectUnsupported(t *testing.T) {
+	_, ok := Detect([]byte{0x00, 0x01, 0x02})
 	if ok {
 		t.Fatal("should not detect random bytes")
 	}
@@ -178,6 +206,29 @@ func TestExtensionFromMIMEUnknown(t *testing.T) {
 	ext := ExtensionFromMIME("application/octet-stream")
 	if ext != ".bin" {
 		t.Fatalf("expected .bin for unknown mime, got %s", ext)
+	}
+}
+
+func TestValidateExtension(t *testing.T) {
+	tests := []struct {
+		filename     string
+		mime         string
+		expectMatch  bool
+	}{
+		{"photo.png", "image/png", true},
+		{"photo.jpg", "image/png", false},
+		{"video.mp4", "video/mp4", true},
+		{"doc.txt", "text/plain", true},
+		{"doc.pdf", "application/pdf", true},
+		{"doc.pdf", "image/png", false},
+		{"noext", "image/png", true},    // no extension → skip
+		{"evil.exe", "video/mp4", true}, // unknown extension → skip (other checks catch it)
+	}
+	for _, tt := range tests {
+		got := ValidateExtension(tt.filename, tt.mime)
+		if got != tt.expectMatch {
+			t.Errorf("ValidateExtension(%q, %q) = %v, want %v", tt.filename, tt.mime, got, tt.expectMatch)
+		}
 	}
 }
 

@@ -23,6 +23,8 @@ var allowed = map[string]TypeInfo{
 	"audio/aac":  {"audio/aac", ".aac", "audio"},
 	"video/mp4":  {"video/mp4", ".mp4", "video"},
 	"video/webm": {"video/webm", ".webm", "video"},
+	"text/plain": {"text/plain", ".txt", "document"},
+	"application/pdf":     {"application/pdf", ".pdf", "document"},
 }
 
 var extToMIME = map[string]string{}
@@ -34,6 +36,9 @@ func init() {
 }
 
 func Detect(data []byte) (*TypeInfo, bool) {
+	if len(data) == 0 {
+		return nil, false
+	}
 	raw := http.DetectContentType(data)
 	mediatype, _, err := mime.ParseMediaType(raw)
 	if err != nil {
@@ -57,4 +62,25 @@ func ExtensionFromMIME(mimeType string) string {
 		return ".bin"
 	}
 	return exts[0]
+}
+
+// MIMEFromExtension looks up the expected MIME type for a file extension.
+// Returns empty string if the extension is not in the allowed map.
+func MIMEFromExtension(ext string) string {
+	return extToMIME[ext]
+}
+
+// ValidateExtension checks whether the filename's extension matches the
+// detected MIME type. Returns true if the extension is unknown or matches.
+func ValidateExtension(filename, detectedMIME string) bool {
+	idx := strings.LastIndex(filename, ".")
+	if idx < 0 {
+		return true // no extension, skip check
+	}
+	ext := filename[idx:]
+	expected := extToMIME[ext]
+	if expected == "" {
+		return true // unknown extension, skip check
+	}
+	return expected == detectedMIME
 }

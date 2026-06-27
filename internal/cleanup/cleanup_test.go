@@ -22,7 +22,7 @@ func TestCleanupExpiredRecords(t *testing.T) {
 	defer store.Close()
 
 	drivers := map[string]storage.Storage{
-		"local": storage.NewLocalDriver(filepath.Join(dir, "objects")),
+		"local": storage.NewLocalDriver("local", filepath.Join(dir, "objects")),
 	}
 
 	now := time.Now().Unix()
@@ -102,7 +102,7 @@ func TestCleanupNoExpired(t *testing.T) {
 	defer store.Close()
 
 	drivers := map[string]storage.Storage{
-		"local": storage.NewLocalDriver(filepath.Join(dir, "objects")),
+		"local": storage.NewLocalDriver("local", filepath.Join(dir, "objects")),
 	}
 
 	cfg := &config.Config{

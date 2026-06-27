@@ -25,7 +25,7 @@ func setupReadTest(t *testing.T) (*config.Config, *metadata.Store, map[string]st
 	t.Cleanup(func() { store.Close() })
 
 	drivers := map[string]storage.Storage{
-		"local": storage.NewLocalDriver(dir + "/objects"),
+		"local": storage.NewLocalDriver("local", dir+"/objects"),
 	}
 
 	cfg := &config.Config{

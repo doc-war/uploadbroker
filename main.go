@@ -80,14 +80,27 @@ func main() {
 
 	drivers := make(map[string]storage.Storage)
 	for name, dc := range cfg.Storage.Drivers {
-		switch name {
-		case "local":
-			drivers[name] = storage.NewLocalDriver(dc.Root)
+		switch dc.Provider {
+		case "", "local":
+			if dc.Root == "" {
+				dc.Root = "./data/objects"
+			}
+			drivers[name] = storage.NewLocalDriver(name, dc.Root)
+		case "s3":
+			secure := true
+			if dc.Secure != nil {
+				secure = *dc.Secure
+			}
+			drv, err := storage.NewS3Driver(name, dc.Endpoint, dc.Bucket, dc.Region, dc.AccessKeyID, dc.SecretAccessKey, secure)
+			if err != nil {
+				log.Fatalf("driver %s: %v", name, err)
+			}
+			drivers[name] = drv
 		default:
-			log.Fatalf("unsupported driver: %s", name)
+			log.Fatalf("unsupported provider %q for driver %s", dc.Provider, name)
 		}
 	}
-	log.Printf("  drivers: %d configured (%s)", len(drivers), cfg.Storage.UploadDriver)
+	log.Printf("  drivers: %d configured (upload=%s)", len(drivers), cfg.Storage.UploadDriver)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

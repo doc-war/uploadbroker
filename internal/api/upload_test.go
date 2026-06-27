@@ -28,7 +28,7 @@ func newTestFixture(t *testing.T) (*config.Config, *metadata.Store, map[string]s
 	t.Cleanup(func() { store.Close() })
 
 	drivers := map[string]storage.Storage{
-		"local": storage.NewLocalDriver(filepath.Join(dir, "objects")),
+		"local": storage.NewLocalDriver("local", filepath.Join(dir, "objects")),
 	}
 
 	cfg := &config.Config{
@@ -194,7 +194,7 @@ func TestUploadUnsupportedMIME(t *testing.T) {
 	cfg, store, drv, _ := newTestFixture(t)
 	h := NewUploadHandler(cfg, store, drv)
 
-	r := multipartUpload(t, []byte("plain text"), "test.txt", "")
+	r := multipartUpload(t, []byte("<html>test</html>"), "test.html", "")
 	w := httptest.NewRecorder()
 	h.ServeHTTP(w, r)
 

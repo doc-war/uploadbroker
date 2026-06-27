@@ -41,7 +41,7 @@ func (h *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file, _, err := r.FormFile("file")
+	file, header, err := r.FormFile("file")
 	if err != nil {
 		writeError(w, 40001, "missing file")
 		return
@@ -62,6 +62,11 @@ func (h *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	mimeInfo, ok := mime.Detect(data)
 	if !ok {
 		writeError(w, 40003, "unsupported mime")
+		return
+	}
+
+	if !mime.ValidateExtension(header.Filename, mimeInfo.MIME) {
+		writeError(w, 40006, fmt.Sprintf("mime mismatch: declared extension does not match %s", mimeInfo.MIME))
 		return
 	}
 
@@ -146,6 +151,8 @@ func (h *UploadHandler) maxSize(category string) int64 {
 		return int64(h.cfg.Limits.Audio)
 	case "video":
 		return int64(h.cfg.Limits.Video)
+	case "document":
+		return int64(h.cfg.Limits.Document)
 	default:
 		return int64(h.cfg.Limits.Image)
 	}

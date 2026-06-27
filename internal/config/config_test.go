@@ -56,6 +56,9 @@ url_blake2b_salts:
 	if cfg.Storage.UploadDriver != "local" {
 		t.Fatalf("Storage.UploadDriver = %s", cfg.Storage.UploadDriver)
 	}
+	if cfg.Storage.Drivers["local"].Provider != "local" {
+		t.Fatalf("local provider = %s", cfg.Storage.Drivers["local"].Provider)
+	}
 	if cfg.Storage.Drivers["local"].Root != "./data/objects" {
 		t.Fatalf("local root = %s", cfg.Storage.Drivers["local"].Root)
 	}
