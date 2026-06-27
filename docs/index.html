@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Broker — Lightweight Resource Broker for AI</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2322d3ee'/><text x='16' y='22' font-size='20' text-anchor='middle' fill='%230a0e17' font-family='monospace' font-weight='bold'>UB</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0e17;--bg2:#111827;--bg3:#1a2236;--fg:#e2e8f0;--fg2:#94a3b8;--accent:#22d3ee;--accent2:#0891b2;--border:#1e293b;--red:#f87171;--green:#4ade80;--radius:12px;--font:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans',sans-serif}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--fg);line-height:1.7;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* layout */
+.container{max-width:1120px;margin:0 auto;padding:0 24px}
+section{padding:80px 0}
+.section-label{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:8px}
+h2{font-size:2rem;font-weight:800;margin-bottom:16px;letter-spacing:-.02em}
+h2+p{color:var(--fg2);font-size:1.05rem;max-width:640px;margin-bottom:40px}
+
+/* hero */
+.hero{min-height:90vh;display:flex;align-items:center;padding:120px 0 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40%;right:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(34,211,238,.06),transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.25);border-radius:999px;padding:4px 14px 4px 10px;font-size:.8rem;color:var(--accent);margin-bottom:24px}
+.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block}
+.hero h1{font-size:clamp(2.5rem,6vw,4.2rem);font-weight:900;letter-spacing:-.03em;line-height:1.1}
+.hero h1 span{color:var(--accent)}
+.hero p{font-size:clamp(1rem,2vw,1.2rem);color:var(--fg2);max-width:600px;margin:20px 0 36px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:8px;font-weight:600;font-size:.95rem;cursor:pointer;transition:.2s;border:none}
+.btn-primary{background:var(--accent);color:var(--bg)}
+.btn-primary:hover{background:var(--accent2);text-decoration:none;transform:translateY(-1px)}
+.btn-ghost{border:1px solid var(--border);color:var(--fg);background:transparent}
+.btn-ghost:hover{border-color:var(--fg2);text-decoration:none;transform:translateY(-1px)}
+.btn-ghost svg{opacity:.6}
+
+/* comparison table */
+.comparison-wrapper{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead th{padding:18px 16px;text-align:left;font-size:.85rem;font-weight:700;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap}
+thead th:first-child{color:var(--fg2)}
+thead th:nth-child(2){color:var(--accent2)}
+thead th:nth-child(3){color:var(--accent2)}
+thead th:last-child{color:var(--accent)}
+tbody td{padding:16px;font-size:.9rem;border-bottom:1px solid var(--border);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody td:first-child{font-weight:600;color:var(--fg2);white-space:nowrap;width:120px}
+tbody td:nth-child(2),
+tbody td:nth-child(3){color:var(--fg)}
+tbody td:last-child{color:var(--accent);font-weight:500}
+.highlight-row{background:linear-gradient(135deg,rgba(34,211,238,.06),rgba(34,211,238,.02))}
+.highlight-row td{position:relative}
+.highlight-row td:last-child{border-left:2px solid var(--accent)}
+.value-gap{display:block;font-size:.82rem;color:var(--green);margin-top:4px}
+.value-gap::before{content:'✦ '}
+
+/* value cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px 28px;transition:.25s;position:relative}
+.card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 8px 32px rgba(34,211,238,.08)}
+.card-icon{font-size:1.6rem;margin-bottom:16px;display:inline-block}
+.card h3{font-size:1.1rem;margin-bottom:10px}
+.card p{font-size:.9rem;color:var(--fg2);line-height:1.7}
+
+/* quickstart */
+.quickstart-cols{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+@media(max-width:720px){.quickstart-cols{grid-template-columns:1fr}}
+.code-block{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px;overflow-x:auto}
+.code-block pre{font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;font-size:.82rem;color:var(--fg);line-height:1.6;white-space:pre}
+.code-block .kw{color:#c084fc}
+.code-block .str{color:#4ade80}
+.code-block .cm{color:var(--fg2)}
+.code-block .num{color:#fbbf24}
+.code-block .tag{color:#22d3ee}
+.step{display:flex;gap:14px;margin-bottom:20px;align-items:flex-start}
+.step-num{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--bg);font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+.step p{color:var(--fg2);font-size:.9rem}
+.step code{background:var(--bg3);padding:2px 8px;border-radius:4px;font-size:.82rem;color:var(--accent)}
+
+/* footer */
+footer{border-top:1px solid var(--border);padding:32px 0;color:var(--fg2);font-size:.85rem}
+footer .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+footer .left{font-weight:600}
+footer .right{display:flex;align-items:center;gap:20px}
+footer a{color:var(--fg);font-weight:500}
+footer a:hover{color:var(--accent);text-decoration:none}
+
+/* utilities */
+.text-center{text-align:center}
+.mb-8{margin-bottom:32px}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      v1.0.0 &middot; MIT License
+    </div>
+    <h1><span>Upload</span> Broker</h1>
+    <p>轻量级资源代理网关 —— 专为 AI 推理平台的临时文件上传、读取与生命周期管理设计。不重新发明存储，而是做现有存储（Local / S3 / R2 / OSS）的统一安全外壳。</p>
+    <p style="color:var(--accent);font-weight:700;font-size:clamp(1.1rem,2.2vw,1.4rem);margin-top:-12px">它就是临时存储界的 <span style="background:linear-gradient(135deg,#22d3ee,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Redis</span>。</p>
+    <div class="hero-actions">
+      <a href="https://github.com/doc-war/UploadBroker" class="btn btn-primary" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+      <a href="#quickstart" class="btn btn-ghost">快速开始</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-label text-center">Comparison</div>
+    <h2 class="text-center">不重新发明存储，重新设计<em>接入方式</em></h2>
+    <p class="text-center" style="margin:0 auto 40px">Upload Broker 不跟 MinIO / SeaweedFS 竞争"谁存的更多"，而是在上层提供一​​个极致的统一安全抽象层。</p>
+
+    <div class="comparison-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>MinIO</th>
+            <th>SeaweedFS</th>
+            <th>Upload Broker</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>定位</td>
+            <td>完整的底层对象存储解决方案，S3 兼容</td>
+            <td>分布式文件存储，FUSE / S3 / NoSQL 多接口</td>
+            <td>临时资源管理的轻量级代理网关，做现有存储的统一外壳</td>
+          </tr>
+          <tr>
+            <td>生命周期</td>
+            <td>长期存储，TTL 依赖底层 Lifecycle 策略（天级，非实时）</td>
+            <td>长期存储，无原生 TTL，依赖外部清理</td>
+            <td>专为临时资源（TTL 1~24h）设计，后台秒/分级主动清理<span class="value-gap">极其完美地契合了 AI 推理（图生图、语音转文字）产生大量高频、短命临时文件的刚需</span></td>
+          </tr>
+          <tr>
+            <td>安全性</td>
+            <td>暴露整个存储桶权限（Presigned URL），权限控制粒度较粗</td>
+            <td>桶/Collection 级别权限，无 URL 签名机制</td>
+            <td>统一 BLAKE2b 内容寻址，URL 签名 + Salt 轮换由 Broker 隐式收口，支持内网无感切换到公网 HMAC 鉴权<span class="value-gap">零信任架构：上层 Platform 不需要知道底层存储结构，URL 甚至不暴露真实桶路径</span></td>
+          </tr>
+          <tr>
+            <td>体积与依赖</td>
+            <td>部署较重，需维护集群状态或复杂配置</td>
+            <td>部署较重，Master + Volume 架构，运维成本高</td>
+            <td>Go 单二进制 + SQLite，极简内聚<span class="value-gap">对开发者极其友好，极易集成进 CI/CD 或作为 Sidecar 部署</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-label text-center">Why Upload Broker</div>
+    <h2 class="text-center">三大核心开源价值</h2>
+    <p class="text-center" style="margin:0 auto 48px">不是又一个对象存储，而是 AI 推理时代的资源代理基础设施。</p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h3>AI 推理时代的刚需基础设施</h3>
+        <p>首个为AI中间件服务的文件Broker。推理场景中，临时图片、PDF、语音、视频文件高速流转。Upload Broker 填补了"AI 临时文件生命周期管理"的空白 —— 就像存储界的 Redis，专注缓存、临时、高性能，而非底层持久化。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧱</div>
+        <h3>极致的防腐层</h3>
+        <p>业务从本地存储切到阿里云 OSS 再到 Cloudflare R2，上层 Platform <strong>一行代码都不用改</strong>。Platform 只需要无脑调用 <code>POST /upload</code>，拿回标准 URL。底层怎么切、怎么换驱动，业务层零感知。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔐</div>
+        <h3>渐进式安全架构</h3>
+        <p>可选的 <code>hmac_secret</code> 让项目能屈能伸：<br><br>
+        <strong>个人开发者</strong>：不加 Secret，直接当个人图床或测试工具，零配置启动。<br>
+        <strong>企业用户</strong>：开启 HMAC + 多 Salt 轮换，直接接入微服务矩阵。<br><br>
+        同一份代码，在"吸引初学者"和"满足企业落地"之间取得完美平衡。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quickstart">
+  <div class="container">
+    <div class="section-label text-center">Quick Start</div>
+    <h2 class="text-center">30 秒启动</h2>
+    <p class="text-center" style="margin:0 auto 48px">单二进制，零外部依赖。</p>
+
+    <div class="quickstart-cols">
+      <div>
+        <div class="step">
+          <span class="step-num">1</span>
+          <div><p>下载二进制（或 <code>go install</code>）</p></div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div><p>编写配置 <code>uploadBroker.yaml</code></p></div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div><p>启动 Broker</p></div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div><p>上传文件</p></div>
+        </div>
+        <div class="step" style="margin-bottom:0">
+          <span class="step-num">5</span>
+          <div><p>读取文件</p></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="code-block">
+          <pre><span class="cm"># uploadBroker.yaml</span>
+<span class="tag">listen</span>: <span class="num">127.0.0.1:9001</span>
+<span class="tag">base_url</span>: <span class="str">https://upload.example.com</span>
+<span class="tag">url_blake2b_salts</span>:
+  - <span class="str">current-salt</span>
+<span class="tag">url_prefix</span>: <span class="str">tmp</span>
+
+<span class="tag">storage</span>:
+  <span class="tag">upload_driver</span>: <span class="str">local</span>
+  <span class="tag">drivers</span>:
+    <span class="tag">local</span>:
+      <span class="tag">root</span>: <span class="str">./objects</span>
+
+<span class="cm"># optional hmac_secret for production</span>
+<span class="cm"># hmac_secret: "platform_broker_shared_token"</span></pre>
+        </div>
+
+        <div class="code-block" style="margin-top:12px">
+          <pre>$ <span class="kw">./uploadBroker</span>
+$ <span class="kw">curl</span> -F <span class="str">"file=@photo.png"</span> <span class="str">"http://127.0.0.1:9001/v1/upload"</span>
+{<span class="str">"code"</span>:<span class="num">0</span>,<span class="str">"data"</span>:{<span class="str">"url"</span>:<span class="str">"https://..."</span>,<span class="str">"mimeType"</span>:<span class="str">"image/png"</span>}}
+$ <span class="kw">curl</span> <span class="str">"https://upload.example.com/tmp/..."</span> <span class="cm"># 读取文件</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="left">Upload Broker &middot; MIT License</div>
+    <div class="right">
+      <a href="https://github.com/doc-war/UploadBroker" target="_blank" rel="noopener">GitHub</a>
+      <a href="#" style="display:inline-flex;align-items:center;gap:4px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+        回到顶部
+      </a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+listen: 127.0.0.1:0
+base_url: http://localhost
+url_blake2b_salts:
+  - dev-salt
+url_prefix: tmp
+metadata_db: ./data/broker.db
+cleanup_interval: 10m
+default_ttl: 24h
+
+hmac_secret: ""
+
+limits:
+  image: 2MB
+  audio: 3MB
+  video: 10MB
+
+storage:
+  upload_driver: local
+  drivers:
+    local:
+      root: ./data/objects

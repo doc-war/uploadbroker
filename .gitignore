@@ -1,0 +1,47 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+uploadBroker
+
+# Test binary
+*.test
+*.out
+
+# Go workspace
+go.work
+
+# Data directories
+data/storage/*
+data/live/*
+data/logs/*
+data/objects/*
+!data/storage/.gitkeep
+!data/live/.gitkeep
+!data/logs/.gitkeep
+!data/objects/.gitkeep
+
+# SQLite database
+*.db
+*.db-wal
+*.db-shm
+
+# Runtime
+.port
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
