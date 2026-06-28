@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UploadBroker — 轻量级 AI 临时文件资源代理 | Lightweight Resource Broker for AI</title>
-<meta name="description" content="uploadbroker：专为 AI 推理平台设计的临时文件资源代理网关。单二进制部署，多存储后端（Local/S3/OSS/R2），魔数检测防伪装，URL 签名保护，TTL 自动清理。它就是临时存储界的 Redis。">
+<title>UploadBroker — 轻量级 AI 临时文件资源代理</title>
+<meta name="description" content="UploadBroker 是专为 AI 推理平台设计的轻量级资源代理网关：不重新发明存储，只给 Local / S3 / OSS / R2 / COS 套一层统一的安全外壳——签发、校验、到期回收，一条龙。它就是临时存储界的 Redis。">
 <meta name="keywords" content="uploadbroker,AI 临时文件,资源代理,文件上传网关,MinIO 替代,S3 网关,TTL 文件管理,AI 推理">
 <meta property="og:type" content="website">
-<meta property="og:title" content="uploadbroker — 轻量级 AI 临时文件资源代理">
-<meta property="og:description" content="专为 AI 推理平台设计的临时文件资源代理网关。单二进制部署，多存储后端，魔数检测，URL 签名，TTL 自动清理。">
+<meta property="og:title" content="UploadBroker — 轻量级 AI 临时文件资源代理">
+<meta property="og:description" content="UploadBroker 是专为 AI 推理平台设计的轻量级资源代理网关：不重新发明存储，只给 Local / S3 / OSS / R2 / COS 套一层统一的安全外壳——签发、校验、到期回收，一条龙。它就是临时存储界的 Redis。">
 <meta property="og:url" content="https://doc-war.com/uploadbroker">
 <meta property="og:image" content="https://doc-war.com/img/logo.png">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="uploadbroker — 轻量级 AI 临时文件资源代理">
-<meta name="twitter:description" content="专为 AI 推理平台设计的临时文件资源代理网关。单二进制部署，多存储后端，魔数检测，URL 签名，TTL 自动清理。">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2322d3ee'/><text x='16' y='22' font-size='20' text-anchor='middle' fill='%230a0e17' font-family='monospace' font-weight='bold'>UB</text></svg>">
-<script src="/analytics.js" defer></script><!-- 引入统计代码 -->
-<link rel="icon" href="/img/favicon.ico" type="image/x-icon"><!-- 引入官网ico -->
+<meta name="twitter:title" content="UploadBroker — 轻量级 AI 临时文件资源代理">
+<meta name="twitter:description" content="UploadBroker 是专为 AI 推理平台设计的轻量级资源代理网关：不重新发明存储，只给 Local / S3 / OSS / R2 / COS 套一层统一的安全外壳——签发、校验、到期回收，一条龙。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23ae3326'/><text x='16' y='22' font-size='20' text-anchor='middle' fill='%23f2ead3' font-family='monospace' font-weight='bold'>UB</text></svg>">
+<link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+<script src="/analytics.js" defer></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "uploadbroker",
+  "name": "UploadBroker",
   "description": "轻量级 AI 临时文件资源代理网关。专为 AI 推理平台的临时文件上传、读取与生命周期管理设计。多存储后端（Local / S3 / OSS / R2），安全防护（魔数检测 + URL 签名 + TTL），单二进制部署。",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Linux, macOS, Windows",
@@ -32,9 +32,7 @@
   "author": {
     "@type": "Organization",
     "name": "doc-war",
-    "url": "https://doc-war.com",
-    "jobTitle": "产品经理 | 全栈架构师 | 文档工程师",
-    "description": "zhaoliwei，网名越石父，花名青樵，月光博客早期知名评论员，曾以提供判断力价值的评论风格而闻名。主张设计驱动，注重文档驱动，专注于基础协议和基础工具研发。"
+    "url": "https://doc-war.com"
   },
   "offers": {
     "@type": "Offer",
@@ -43,166 +41,279 @@
   }
 }
 </script>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0a0e17;--bg2:#111827;--bg3:#1a2236;--fg:#e2e8f0;--fg2:#94a3b8;--accent:#22d3ee;--accent2:#0891b2;--border:#1e293b;--red:#f87171;--green:#4ade80;--radius:12px;--font:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans',sans-serif}
-html{font-size:16px;scroll-behavior:smooth}
-body{font-family:var(--font);background:var(--bg);color:var(--fg);line-height:1.7;min-height:100vh}
-a{color:var(--accent);text-decoration:none}
-a:hover{text-decoration:underline}
-
-/* layout */
-.container{max-width:1120px;margin:0 auto;padding:0 24px}
-section{padding:80px 0}
-.section-label{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:8px}
-h2{font-size:2rem;font-weight:800;margin-bottom:16px;letter-spacing:-.02em}
-h2+p{color:var(--fg2);font-size:1.05rem;max-width:640px;margin-bottom:40px}
-
-/* hero */
-.hero{min-height:90vh;display:flex;align-items:center;padding:120px 0 80px;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-40%;right:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(34,211,238,.06),transparent 70%);pointer-events:none}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.25);border-radius:999px;padding:4px 14px 4px 10px;font-size:.8rem;color:var(--accent);margin-bottom:24px}
-.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block}
-.hero h1{font-size:clamp(2.5rem,6vw,4.2rem);font-weight:900;letter-spacing:-.03em;line-height:1.1}
-.hero h1 span{color:var(--accent)}
-.hero p{font-size:clamp(1rem,2vw,1.2rem);color:var(--fg2);max-width:600px;margin:20px 0 36px}
-.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:8px;font-weight:600;font-size:.95rem;cursor:pointer;transition:.2s;border:none}
-.btn-primary{background:var(--accent);color:var(--bg)}
-.btn-primary:hover{background:var(--accent2);text-decoration:none;transform:translateY(-1px)}
-.btn-ghost{border:1px solid var(--border);color:var(--fg);background:transparent}
-.btn-ghost:hover{border-color:var(--fg2);text-decoration:none;transform:translateY(-1px)}
-.btn-ghost svg{opacity:.6}
-
-/* comparison table */
-.comparison-wrapper{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:700px}
-thead th{padding:18px 16px;text-align:left;font-size:.85rem;font-weight:700;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap}
-thead th:first-child{color:var(--fg2)}
-thead th:nth-child(2){color:var(--accent2)}
-thead th:nth-child(3){color:var(--accent2)}
-thead th:last-child{color:var(--accent)}
-tbody td{padding:16px;font-size:.9rem;border-bottom:1px solid var(--border);vertical-align:top}
-tbody tr:last-child td{border-bottom:none}
-tbody td:first-child{font-weight:600;color:var(--fg2);white-space:nowrap;width:120px}
-tbody td:nth-child(2),
-tbody td:nth-child(3){color:var(--fg)}
-tbody td:last-child{color:var(--accent);font-weight:500}
-.highlight-row{background:linear-gradient(135deg,rgba(34,211,238,.06),rgba(34,211,238,.02))}
-.highlight-row td{position:relative}
-.highlight-row td:last-child{border-left:2px solid var(--accent)}
-.value-gap{display:block;font-size:.82rem;color:var(--green);margin-top:4px}
-.value-gap::before{content:'✦ '}
-
-/* value cards */
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px 28px;transition:.25s;position:relative}
-.card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 8px 32px rgba(34,211,238,.08)}
-.card-icon{font-size:1.6rem;margin-bottom:16px;display:inline-block}
-.card h3{font-size:1.1rem;margin-bottom:10px}
-.card p{font-size:.9rem;color:var(--fg2);line-height:1.7}
-
-/* quickstart */
-.quickstart-cols{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
-@media(max-width:720px){.quickstart-cols{grid-template-columns:1fr}}
-.code-block{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px;overflow-x:auto}
-.code-block pre{font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;font-size:.82rem;color:var(--fg);line-height:1.6;white-space:pre}
-.code-block .kw{color:#c084fc}
-.code-block .str{color:#4ade80}
-.code-block .cm{color:var(--fg2)}
-.code-block .num{color:#fbbf24}
-.code-block .tag{color:#22d3ee}
-.step{display:flex;gap:14px;margin-bottom:20px;align-items:flex-start}
-.step-num{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--bg);font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center}
-.step p{color:var(--fg2);font-size:.9rem}
-.step code{background:var(--bg3);padding:2px 8px;border-radius:4px;font-size:.82rem;color:var(--accent)}
-
-/* footer */
-footer{border-top:1px solid var(--border);padding:32px 0;color:var(--fg2);font-size:.85rem}
-footer .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-footer .left{font-weight:600}
-footer .right{display:flex;align-items:center;gap:20px}
-footer a{color:var(--fg);font-weight:500}
-footer a:hover{color:var(--accent);text-decoration:none}
-
-/* FAQ tabs */
-.faq-tabs{display:flex;gap:0;overflow-x:auto;border-bottom:2px solid var(--border);margin-bottom:0;flex-wrap:nowrap;scrollbar-width:none}
-.faq-tabs::-webkit-scrollbar{display:none}
-.faq-tab{padding:12px 22px;font-size:.88rem;font-weight:600;color:var(--fg2);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font)}
-.faq-tab:hover{color:var(--fg);background:rgba(255,255,255,.02)}
-.faq-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.faq-content{background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:32px;display:none}
-.faq-content.active{display:block}
-.faq-content h4{font-size:1rem;margin-bottom:8px;color:var(--accent)}
-.faq-content p{font-size:.9rem;color:var(--fg2);line-height:1.8;margin-bottom:12px}
-.faq-content p:last-child{margin-bottom:0}
-.faq-content strong{color:var(--fg)}
-.faq-content ul{margin:8px 0 12px 18px;padding:0}
-.faq-content li{font-size:.9rem;color:var(--fg2);line-height:1.8;margin-bottom:4px}
-.faq-content .tag{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:999px;margin-right:6px}
-.tag-green{background:rgba(74,222,128,.12);color:var(--green)}
-.tag-blue{background:rgba(34,211,238,.12);color:var(--accent)}
-.tag-orange{background:rgba(251,191,36,.12);color:#fbbf24}
-.tag-red{background:rgba(248,113,113,.12);color:var(--red)}
-
-/* utilities */
-.text-center{text-align:center}
-.mb-8{margin-bottom:32px}
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <section class="hero">
-  <div class="container">
-    <div class="hero-badge">
-      <span class="hero-badge-dot"></span>
-      v1.0.0 &middot; MIT License
+  <div class="wrap">
+    <div>
+      <div class="hero-badge">
+        MIT License
+      </div>
+      <h1><span class="accent">Upload</span>Broker</h1>
+      <p class="hero__sub">轻量级资源代理网关 —— 专为 AI 推理平台的临时文件上传、读取与生命周期管理设计。不重新发明存储，而是做现有存储（Local / S3 / R2 / OSS）的统一安全外壳。</p>
+      <p class="redis-line">它是<strong>临时存储界</strong>的 <span>Redis</span>。</p>
+      <div class="hero__cta">
+        <div class="ai-skill-btn">
+          <a href="#anatomy" class="btn btn--primary">AI Skill</a>
+          <div class="ai-tooltip">
+            <div class="ai-tooltip__arrow"></div>
+            <div class="ai-tooltip__content">
+              <div class="ai-tooltip__title">AI / Skills 使用指南</div>
+              <p>Upload Broker 支持 AI Agent、AI Coding Assistant、Skills 等自动安装、部署和调用。</p>
+              <div class="ai-tooltip__steps">
+                <div class="ai-tooltip__step"><span class="ai-step-num">1</span>安装指定版本：<br><code class="ai-code">go install github.com/doc-war/uploadbroker/cmd/uploadbroker@latest</code></div>
+                <div class="ai-tooltip__step"><span class="ai-step-num">2</span>自动生成 <code>uploadbroker.yaml</code>，根据可用域名配置 <code>base_url</code></div>
+                <div class="ai-tooltip__step"><span class="ai-step-num">3</span>启动 Broker：<br><code class="ai-code">uploadbroker --config ./your-path/uploadbroker.yaml</code></div>
+                <div class="ai-tooltip__step"><span class="ai-step-num">4</span>健康检查：<code>GET /health</code></div>
+                <div class="ai-tooltip__step"><span class="ai-step-num">5</span>上传资源：<code>POST /v1/upload</code></div>
+                <div class="ai-tooltip__step"><span class="ai-step-num">6</span>返回结果中的 <code>url</code> 为公网可访问地址，直接作为 AI 模型输入</div>
+              </div>
+              <a href="https://raw.githubusercontent.com/doc-war/uploadbroker/main/docs/skill.md" class="ai-tooltip__link" target="_blank" rel="noopener">去github仓库docs/skill.md查看完整指引 &rarr;</a>
+            </div>
+          </div>
+        </div>
+        <a href="https://github.com/doc-war/uploadbroker" class="btn btn--ghost" rel="noopener" target="_blank">查看源码 ↗</a>
+      </div>
+      <p class="hero__stats">3 个端点 · 6 项安全校验 · 0 外部运行时依赖</p>
     </div>
-    <h1><span>Upload</span>Broker</h1>
-    <p>轻量级资源代理网关 —— 专为 AI 推理平台的临时文件上传、读取与生命周期管理设计。不重新发明存储，而是做现有存储（Local / S3 / R2 / OSS）的统一安全外壳。</p>
-    <p style="color:var(--accent);font-weight:700;font-size:clamp(1.1rem,2.2vw,1.4rem);margin-top:-12px">它就是临时存储界的 <span style="background:linear-gradient(135deg,#22d3ee,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Redis</span>。</p>
-    <div class="hero-actions">
-      <a href="https://github.com/doc-war/uploadbroker" class="btn btn-primary" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        GitHub
-      </a>
-      <a href="#quickstart" class="btn btn-ghost">快速开始</a>
+
+    <div class="ticket" aria-hidden="false">
+      <div class="ticket__stub"><span>UPLOADBROKER</span></div>
+      <div class="ticket__main">
+        <div class="ticket__head">
+          <span class="ticket__title">提货单 · CLAIM TICKET</span>
+          <span class="ticket__serial">№ 9F21C7</span>
+        </div>
+        <div class="ticket__rule"></div>
+        <div class="ticket__fields">
+          <div class="field"><span class="field__label">Issued</span><span class="field__value">10:42:07</span></div>
+          <div class="field"><span class="field__label">Expires</span><span class="field__value">+24h</span></div>
+          <div class="field"><span class="field__label">Key</span><span class="field__value">9c3f…e21a</span></div>
+          <div class="field"><span class="field__label">Token</span><span class="field__value">4b7e…90fd</span></div>
+          <div class="field"><span class="field__label">Shard</span><span class="field__value">9c</span></div>
+          <div class="field"><span class="field__label">Backend</span><span class="field__value">aws-s3</span></div>
+        </div>
+        <div class="ticket__bars" aria-hidden="true">
+          <span style="width:2px;height:60%"></span><span style="width:1px;height:90%"></span>
+          <span style="width:3px;height:40%"></span><span style="width:1px;height:75%"></span>
+          <span style="width:2px;height:100%"></span><span style="width:1px;height:55%"></span>
+          <span style="width:4px;height:65%"></span><span style="width:1px;height:85%"></span>
+          <span style="width:2px;height:35%"></span><span style="width:1px;height:95%"></span>
+          <span style="width:1px;height:50%"></span><span style="width:3px;height:70%"></span>
+          <span style="width:1px;height:80%"></span><span style="width:2px;height:45%"></span>
+          <span style="width:1px;height:90%"></span><span style="width:2px;height:60%"></span>
+        </div>
+        <span class="ticket__barcap">BLAKE2b-256 · HMAC SIGNED</span>
+        <div class="stamp"><b>已签发</b><span>ISSUED</span></div>
+      </div>
     </div>
   </div>
 </section>
 
-<section>
-  <div class="container">
-    <div class="section-label text-center">Positioning</div>
-    <h2 class="text-center">不重新发明存储，重新设计<em>接入方式</em></h2>
-    <p class="text-center" style="margin:0 auto 40px">uploadbroker 不做底层存储——它在存储的前面充当统一的安全代理层。</p>
+<section class="block reveal" id="why">
+  <div class="wrap">
+    <div class="block__head">
+      <span class="eyebrow">POSITIONING</span>
+      <h2>不重新发明存储，重新设计接入方式</h2>
+      <p>uploadbroker 不做底层存储——它在存储的前面充当统一的安全代理层。</p>
+    </div>
 
-    <div class="cards" style="grid-template-columns:1fr 1fr;max-width:800px;margin:0 auto">
-      <div class="card">
-        <h3 style="font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;color:var(--accent2);margin-bottom:6px">定位</h3>
-        <p>临时资源管理的轻量级代理网关，做现有存储（Local / S3 / OSS / R2）的统一安全外壳。</p>
+    <div class="why-cards">
+      <div class="why-card">
+        <span class="why-card__label">定位</span>
+        <h4>轻量级代理网关</h4>
+        <p>专为AI推理时代的临时资源url消费设计：给 Local / S3 / OSS / R2 这些现成仓库，套一层开箱即用的安全外壳——签发、校验、到期回收，一条龙。</p>
       </div>
-      <div class="card">
-        <h3 style="font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;color:var(--accent2);margin-bottom:6px">生命周期</h3>
-        <p>专为 TTL 1~24h 设计，后台秒/分级主动清理。契合 AI 推理（图生图、语音转文字）高频短命临时文件的刚需。</p>
+      <div class="why-card">
+        <span class="why-card__label">生命周期</span>
+        <h4>专为 TTL 1~24h 设计</h4>
+        <p>后台秒/分级主动清理，无需 cron 脚本接管。天然契合 AI 推理（图生图、语音转文字）高频产生、短命临时文件的场景。</p>
       </div>
-      <div class="card">
-        <h3 style="font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;color:var(--accent2);margin-bottom:6px">安全性</h3>
-        <p>BLAKE2b 内容寻址 + URL 签名 + Salt 轮换，零信任架构。Platform 不需要知道底层存储结构，URL 不暴露真实桶路径。</p>
+      <div class="why-card">
+        <span class="why-card__label">安全性</span>
+        <h4>内容哈希寻址 + URL 签名</h4>
+        <p>零信任架构。魔数检测、扩展名校验、HMAC 鉴权、Salt 轮换全套兜底。Platform 不需要知道底层存储结构，URL 不暴露真实桶路径。</p>
       </div>
-      <div class="card">
-        <h3 style="font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;color:var(--accent2);margin-bottom:6px">体积与依赖</h3>
-        <p>Go 单二进制 + SQLite，极简内聚。极易集成进 CI/CD 或作为 Sidecar 部署。</p>
+      <div class="why-card">
+        <span class="why-card__label">体积与依赖</span>
+        <h4>Go 单二进制 + SQLite</h4>
+        <p>极简内聚，极易集成进 CI/CD 或作为 Sidecar 部署。存储驱动插件化，后端随意切换，上层零改动。</p>
       </div>
     </div>
   </div>
 </section>
 
-<section id="faq">
-  <div class="container">
-    <div class="section-label text-center">FAQ</div>
-    <h2 class="text-center">为什么不直接用主流框架？</h2>
-    <p class="text-center" style="margin:0 auto 40px">uploadbroker 不做底层存储，而是在上层提供统⼀的安全代理层。以下对比帮你理解它跟主流存储方案的本质区别。</p>
+<section class="block reveal" id="architecture">
+  <div class="wrap">
+    <div class="block__head">
+      <span class="eyebrow">ARCHITECTURE</span>
+      <h2>可嵌入设计，不做上层平台</h2>
+      <p>定位临时存储业务核心，认证交给 Platform，剩下的事跟它没关系</p>
+    </div>
+
+    <div class="arch-flow">
+      <div class="arch-node"><span class="arch-node__label">Client</span><span class="arch-node__sub">发起上传 / 读取</span></div>
+      <span class="arch-arrow">⇢</span>
+      <div class="arch-node"><span class="arch-node__label">Platform</span><span class="arch-node__sub">鉴权 / 限流</span></div>
+      <span class="arch-arrow arch-arrow--dashed">⇢</span>
+      <div class="arch-node arch-node--broker"><span class="arch-node__label">UploadBroker</span><span class="arch-node__sub">签发 / 读取 / 回收</span></div>
+      <span class="arch-arrow">→</span>
+      <div class="arch-node"><span class="arch-node__label">Storage</span><span class="arch-node__sub">Local · S3 · OSS · R2 · COS</span></div>
+    </div>
+    <p class="arch-caption">Platform 决定谁可以访问（Who）；Broker 决定资源是否合法以及如何获取（What & How）。</p>
+    <p class="arch-note">uploadbroker 不管用户、不管权限，只认文件和签名。Platform 把 session 换成 JWT、加一层 RBAC，它没感觉；它换存储驱动或升级安全策略，Platform 也不用跟着发版。同一个实例，可以被多个产品线一起共用。</p>
+  </div>
+</section>
+
+<section class="block reveal" id="quickstart">
+  <div class="wrap">
+    <div class="block__head">
+      <span class="eyebrow">QUICKSTART</span>
+      <h2>快速开始</h2>
+      <p>单二进制部署，无外部运行时依赖。</p>
+    </div>
+  </div>
+  <div class="qs-grid">
+    <div class="qs-left">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div><p>下载二进制（或 <code>go install github.com/doc-war/uploadbroker</code>）</p></div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div><p>编写配置 <code>uploadbroker.yaml</code></p></div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div><p>启动 Broker</p></div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div><p>上传文件</p></div>
+      </div>
+      <div class="step">
+        <span class="step-num">5</span>
+        <div><p>读取文件</p></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="term">
+        <div><span class="c"># uploadbroker.yaml</span></div>
+        <div><span class="p">listen</span>: 127.0.0.1:9001</div>
+        <div><span class="p">base_url</span>: https://upload.example.com   <span class="c"># 注入访问根，拼接提货单</span></div>
+      </div>
+      <div class="term" style="margin-top:12px">
+        <div><span class="c"># 上传 &amp; 读取</span></div>
+        <div><span class="p">$</span> curl -F "file=@photo.png" "http://127.0.0.1:9001/v1/upload"</div>
+        <div>{<span class="c">"code"</span>:0,<span class="c">"data"</span>:{<span class="c">"url"</span>:<span class="c">"https://..."</span>,<span class="c">"mimeType"</span>:<span class="c">"image/png"</span>}}</div>
+        <div><span class="p">$</span> curl "https://upload.example.com/tmp/..."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="anatomy">
+  <div class="wrap">
+    <div class="block__head">
+      <span class="eyebrow">URL ANATOMY</span>
+      <h2>一张提货单，拆开看</h2>
+      <p>资源 URL 由 Broker 签发，五个字段各管一件事，业务层不需要再查库判断权限。</p>
+    </div>
+
+    <div class="anatomy-path">
+      /<span class="seg0">{prefix}</span>/<span class="seg1">{expire}</span>/<span class="seg2">{shard}</span>/<span class="seg3">{key}</span>/<span class="seg4">{token}</span>.{ext}
+    </div>
+
+    <div class="anatomy-legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--ink-soft)"></span><div><h4>{prefix}</h4><p>前缀 · 配置 url_prefix，默认 tmp</p></div></div>
+      <div class="legend-item"><span class="legend-dot" style="background:#4a5a82"></span><div><h4>{expire}</h4><p>几点过期 · Unix 秒级时间戳</p></div></div>
+      <div class="legend-item"><span class="legend-dot" style="background:#6b5a2f"></span><div><h4>{shard}</h4><p>存哪个格子 · key 前两位做目录分片</p></div></div>
+      <div class="legend-item"><span class="legend-dot" style="background:#3f6b52"></span><div><h4>{key}</h4><p>身份证 · BLAKE2b-256 内容哈希</p></div></div>
+      <div class="legend-item"><span class="legend-dot" style="background:#8a3a3a"></span><div><h4>{token}</h4><p>防伪章 · URL 签名，防篡改</p></div></div>
+      <div class="legend-item"><span class="legend-dot" style="background:#7a5a6a"></span><div><h4>{ext}</h4><p>什么类型 · 由 MIME 检测结果推导</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="api">
+  <div class="wrap">
+    <div class="block__head">
+      <span class="eyebrow">API</span>
+      <h2>三个端点，够用了</h2>
+      <p>没有桶管理，没有 ACL，上传、读取、健康检查就是全部。</p>
+    </div>
+
+    <div class="api-list">
+      <div class="api-row">
+        <span class="method method--post">POST</span>
+        <span class="api-path">/v1/upload</span>
+        <span class="api-desc">multipart 上传文件，可选携带 expires / sign / timestamp</span>
+      </div>
+      <div class="api-row">
+        <span class="method method--get">GET</span>
+        <span class="api-path">/v1/health</span>
+        <span class="api-desc">健康检查</span>
+      </div>
+      <div class="api-row">
+        <span class="method method--get">GET</span>
+        <span class="api-path">/{prefix}/{expire}/{shard}/{key}/{token}.{ext}</span>
+        <span class="api-desc">读取资源，URL 由 Broker 签发</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="security">
+  <div class="wrap">
+    <div class="block__head">
+      <span class="eyebrow">SECURITY</span>
+      <h2>默认安全，不是选装件</h2>
+      <p>这些是日常开发里最容易漏掉、出事才想起来补的点，框架层面直接兜底。</p>
+    </div>
+
+    <div class="sec-list">
+      <div class="sec-item"><span class="sec-check">✓</span><div><h4>魔数检测</h4><p>读文件头前 512 字节，确认真实格式，而非只看后缀</p></div></div>
+      <div class="sec-item"><span class="sec-check">✓</span><div><h4>扩展名校验</h4><p>文件名后缀必须和魔数检测结果一致，防伪装上传</p></div></div>
+      <div class="sec-item"><span class="sec-check">✓</span><div><h4>HMAC 上传校验</h4><p>配置 hmac_secret 后，上传必须携带合法签名</p></div></div>
+      <div class="sec-item"><span class="sec-check">✓</span><div><h4>URL 签名</h4><p>BLAKE2b-256 签名，链接被改一个字符就失效</p></div></div>
+      <div class="sec-item"><span class="sec-check">✓</span><div><h4>自动过期回收</h4><p>TTL 到期自动清理，不用自己写定时任务</p></div></div>
+      <div class="sec-item"><span class="sec-check">✓</span><div><h4>路径穿越防护</h4><p>Local 驱动限制 .. 访问，挡掉路径穿越</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="storage">
+  <div class="wrap">
+    <div class="block__head">
+      <span class="eyebrow">STORAGE DRIVERS</span>
+      <h2>存储后端，随便换</h2>
+      <p>写入认 <code class="mono">upload_driver</code>，读取按记录里的 <code class="mono">Backend</code> 自动路由——换厂商不用改业务代码。</p>
+    </div>
+
+    <div class="chips">
+      <span class="chip">Local 文件系统</span>
+      <span class="chip">AWS S3</span>
+      <span class="chip">阿里云 OSS</span>
+      <span class="chip">Cloudflare R2</span>
+      <span class="chip">腾讯 COS</span>
+      <span class="chip">MinIO</span>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="faq">
+  <div class="wrap">
+    <div class="block__head">
+      <span class="eyebrow">FAQ</span>
+      <h2>为什么不直接用主流框架？</h2>
+      <p>uploadbroker 不做底层存储，而是在上层提供统一的安全代理层。以下对比帮你理解它跟主流方案的本质区别。</p>
+    </div>
 
     <div class="faq-tabs" id="faqTabs">
       <button class="faq-tab active" data-tab="minio">MinIO</button>
@@ -214,169 +325,89 @@ footer a:hover{color:var(--accent);text-decoration:none}
 
     <div class="faq-content active" id="faqMinio">
       <h4>MinIO 已经是 S3 兼容的对象存储了，为什么还要套一层 Broker？</h4>
-      <p><span class="tag tag-blue">底层存储</span> MinIO 定位是完整的对象存储系统，而 <strong>uploadbroker 定位是资源代理网关</strong>，它们解决的是不同层次的问题。</p>
+      <p>MinIO 定位是完整的对象存储系统，而 <strong>uploadbroker 定位是资源代理网关</strong>，它们解决的是不同层次的问题。</p>
       <ul>
-        <li><strong>MinIO</strong>：持久化存储海量数据，面向长期存储场景（年级生命周期），需要维护集群、配置桶策略和 Presigned URL 权限</li>
+        <li><strong>MinIO</strong>：持久化存储海量数据，面向长期存储场景，需要维护集群、配置桶策略和 Presigned URL 权限</li>
         <li><strong>uploadbroker</strong>：管理 AI 推理产生的<strong>临时文件</strong>（1~24h TTL），自动清理过期资源，统一安全层（魔数检测 + URL 签名 + 扩展名校验），存储后端对业务透明</li>
       </ul>
-      <p>MinIO 的 Presigned URL 暴露了桶路径和权限模型，而 <strong>Broker 的 URL 零信任</strong>——Platform 只需拿到标准 URL，不需要知道底层是 MinIO、OSS 还是本地磁盘。切换存储后端时上层零改动。</p>
-      <p style="margin-top:16px;padding:12px 16px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent)"><strong>一句话总结</strong>：MinIO 是做存储的，uploadbroker 是做安全的——它始终站在存储的前面，充当统一的安全代理。</p>
+      <p>MinIO 的 Presigned URL 暴露了桶路径和权限模型，而 Broker 的 URL 零信任——Platform 只需拿到标准 URL，不需要知道底层是 MinIO、OSS 还是本地磁盘。</p>
+      <div class="faq-summary"><strong>一句话</strong>：MinIO 是做存储的，uploadbroker 是做安全的——始终站在存储前面，充当统一的安全代理。</div>
     </div>
 
     <div class="faq-content" id="faqSeaweedfs">
       <h4>SeaweedFS 支持 FUSE、S3、NoSQL，为什么不直接用？</h4>
-      <p><span class="tag tag-blue">底层存储</span> SeaweedFS 是一个功能丰富的分布式文件存储，适合大规模持久化数据场景。</p>
       <ul>
         <li><strong>SeaweedFS</strong>：Master + Volume 架构，运维成本高，<strong>无原生短 TTL 机制</strong>，过期清理需外部脚本来做</li>
         <li><strong>uploadbroker</strong>：单二进制，<strong>0 运维</strong>，内建秒级 TTL 清理，底层存储只负责读写，生命周期由 Broker 统一管理</li>
       </ul>
       <p>SeaweedFS 的 FUSE 挂载功能对 AI 训练场景有价值，但对于 <strong>API 驱动的临时文件读写</strong>（推理服务的输出图片、语音、PDF），Broker 更轻量、更聚焦。</p>
-      <p>Broker 甚至可以<strong>以 SeaweedFS 为底层存储</strong>（通过 S3 兼容接口），在其上叠加安全、TTL 和路由能力。</p>
-      <p style="margin-top:16px;padding:12px 16px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent)"><strong>一句话总结</strong>：SeaweedFS 是通用分布式文件系统，uploadbroker 是专为 API 临时文件场景设计的轻量资源代理。</p>
+      <div class="faq-summary"><strong>一句话</strong>：SeaweedFS 是通用分布式文件系统，uploadbroker 是专为 API 临时文件场景设计的轻量资源代理。</div>
     </div>
 
     <div class="faq-content" id="faqCeph">
       <h4>Ceph 是业界标准分布式存储，为什么不直接用？</h4>
-      <p><span class="tag tag-orange">基础设施</span> Ceph 是重量级的企业级分布式存储，提供块、文件、对象三种接口。</p>
       <ul>
         <li><strong>Ceph</strong>：部署复杂（MON/MGR/OSD/MDS），运维门槛极高，适合大规模持久化存储（PB 级）</li>
         <li><strong>uploadbroker</strong>：单二进制，开箱即用，适合 <strong>AI 推理场景中高频产生、短生命周期的临时文件</strong></li>
       </ul>
-      <p>Ceph 在超大规模集群中表现出色，但 AI 推理场景的临时文件管理需求是：<strong>上传 → 消费 → 过期清理</strong>，这个循环只需要小时级存在。用 Ceph 管这种临时数据是"杀鸡用牛刀"。</p>
-      <p>uploadbroker 让你以单二进制部署即可获得企业级安全防护（魔数检测、URL 签名、TTL 管理），<strong>不需要为临时文件搭建重量级分布式存储系统</strong>。</p>
-      <p style="margin-top:16px;padding:12px 16px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent)"><strong>一句话总结</strong>：Ceph 是为大规模持久化设计的，uploadbroker 是为临时文件场景设计的——需求层级不同。</p>
+      <p>Ceph 在超大规模集群中表现出色，但 AI 推理场景的临时文件管理需求是：上传 → 消费 → 过期清理，这个循环只需要小时级存在。用 Ceph 管这种临时数据是"杀鸡用牛刀"。</p>
+      <div class="faq-summary"><strong>一句话</strong>：Ceph 是为大规模持久化设计的，uploadbroker 是为临时文件场景设计的——需求层级不同。</div>
     </div>
 
     <div class="faq-content" id="faqGarage">
       <h4>Garage 轻量且 S3 兼容，为什么不用？</h4>
-      <p><span class="tag tag-green">轻量存储</span> Garage 是一个优秀的轻量级 S3 兼容对象存储，部署简单，适合自托管场景。</p>
       <ul>
-        <li><strong>Garage</strong>：轻量的底层存储节点，<strong>专注于数据持久化和复制</strong>，但缺少资源生命周期管理和安全防护层</li>
+        <li><strong>Garage</strong>：轻量的底层存储节点，<strong>专注于数据持久化和复制</strong>，缺少资源生命周期管理和安全防护层</li>
         <li><strong>uploadbroker</strong>：在存储之上提供 <strong>完整的安全链</strong>——魔数检测、扩展名校验、URL 签名、HMAC 鉴权、Salt 轮换</li>
       </ul>
-      <p>如果把 Garage 和 uploadbroker 放在一起看：Garage 是做<strong>后端存储</strong>的，Broker 是做<strong>前端安全代理</strong>的。它们<strong>完美互补</strong>——你可以用 Garage 当底层，Broker 当接入层。</p>
-      <p>uploadbroker 的独特价值在于：<strong>存储后端的可替换性</strong>——今天用 Garage，明天切 MinIO，后天切阿里云 OSS，Platform 端的 API 和 URL 格式零变化。</p>
-      <p style="margin-top:16px;padding:12px 16px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent)"><strong>一句话总结</strong>：Garage 和 uploadbroker 不是替代关系，而是互补关系——Garage 管存储，Broker 管安全与生命周期。</p>
+      <p>Garage 和 uploadbroker <strong>完美互补</strong>——你可以用 Garage 当底层，Broker 当接入层。今天用 Garage，明天切 MinIO，后天切阿里云 OSS，Platform 端零感知。</p>
+      <div class="faq-summary"><strong>一句话</strong>：Garage 和 uploadbroker 不是替代关系，而是互补关系——Garage 管存储，Broker 管安全与生命周期。</div>
     </div>
 
     <div class="faq-content" id="faqRustfs">
       <h4>RustFS 高性能高安全，为什么不直接用？</h4>
-      <p><span class="tag tag-red">新兴存储</span> RustFS 以高性能和内存安全著称，适合 IO 密集型场景。</p>
       <ul>
         <li><strong>RustFS</strong>：专注于底层存储性能和一致性，适合高频读写场景，<strong>但缺少针对 AI 临时文件场景的业务抽象</strong></li>
         <li><strong>uploadbroker</strong>：专注 <strong>AI 推理工作流</strong>——图生图输出 PNG、语音转文字输出 WAV/MP3、视频处理输出 MP4，每个文件天然小时级 TTL</li>
       </ul>
-      <p>RustFS 的存储性能优势在底层，但 uploadbroker 的价值在<strong>上层业务逻辑</strong>：内容寻址、MIME 安全洗牌、多存储路由、自动过期清理。Broker 甚至可以用 RustFS 作为底层后端。</p>
       <p>性能并非 AI 临时文件管理的瓶颈——通常单机就能承载推理节点的输出流量。真正的痛点是：<strong>安全防护、过期管理和存储切换的灵活性</strong>，这正是 uploadbroker 的核心能力。</p>
-      <p style="margin-top:16px;padding:12px 16px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent)"><strong>一句话总结</strong>：RustFS 优化的是存储性能，uploadbroker 优化的是业务安全与灵活性——不同层次的差异化价值。</p>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="container">
-    <div class="section-label text-center">Why uploadbroker</div>
-    <h2 class="text-center">三大核心开源价值</h2>
-    <p class="text-center" style="margin:0 auto 48px">不是又一个对象存储，而是 AI 推理时代的资源代理基础设施。</p>
-
-    <div class="cards">
-      <div class="card">
-        <div class="card-icon">⚡</div>
-        <h3>AI 推理时代的刚需基础设施</h3>
-        <p>首个为AI中间件服务的文件Broker。推理场景中，临时图片、PDF、语音、视频文件高速流转。uploadbroker 填补了"AI 临时文件生命周期管理"的空白 —— 就像存储界的 Redis，专注缓存、临时、高性能，而非底层持久化。</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">🧱</div>
-        <h3>极致的防腐层</h3>
-        <p>业务从本地存储切到阿里云 OSS 再到 Cloudflare R2，上层 Platform <strong>一行代码都不用改</strong>。Platform 只需要无脑调用 <code>POST /upload</code>，拿回标准 URL。底层怎么切、怎么换驱动，业务层零感知。</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">🔐</div>
-        <h3>渐进式安全架构</h3>
-        <p>可选的 <code>hmac_secret</code> 让项目能屈能伸：<br><br>
-        <strong>个人开发者</strong>：不加 Secret，直接当个人图床或测试工具，零配置启动。<br>
-        <strong>企业用户</strong>：开启 HMAC + 多 Salt 轮换，直接接入微服务矩阵。<br><br>
-        同一份代码，在"吸引初学者"和"满足企业落地"之间取得完美平衡。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="quickstart">
-  <div class="container">
-    <div class="section-label text-center">Quick Start</div>
-    <h2 class="text-center">30 秒启动</h2>
-    <p class="text-center" style="margin:0 auto 48px">单二进制，零外部依赖。</p>
-
-    <div class="quickstart-cols">
-      <div>
-        <div class="step">
-          <span class="step-num">1</span>
-          <div><p>下载二进制（或 <code>go install</code>）</p></div>
-        </div>
-        <div class="step">
-          <span class="step-num">2</span>
-          <div><p>编写配置 <code>uploadbroker.yaml</code></p></div>
-        </div>
-        <div class="step">
-          <span class="step-num">3</span>
-          <div><p>启动 Broker</p></div>
-        </div>
-        <div class="step">
-          <span class="step-num">4</span>
-          <div><p>上传文件</p></div>
-        </div>
-        <div class="step" style="margin-bottom:0">
-          <span class="step-num">5</span>
-          <div><p>读取文件</p></div>
-        </div>
-      </div>
-
-      <div>
-        <div class="code-block">
-          <pre><span class="cm"># uploadbroker.yaml</span>
-<span class="tag">listen</span>: <span class="num">127.0.0.1:9001</span>
-<span class="tag">base_url</span>: <span class="str">https://upload.example.com</span>
-<span class="tag">url_blake2b_salts</span>:
-  - <span class="str">current-salt</span>
-<span class="tag">url_prefix</span>: <span class="str">tmp</span>
-
-<span class="tag">storage</span>:
-  <span class="tag">upload_driver</span>: <span class="str">local</span>
-  <span class="tag">drivers</span>:
-    <span class="tag">local</span>:
-      <span class="tag">root</span>: <span class="str">./objects</span>
-
-<span class="cm"># optional hmac_secret for production</span>
-<span class="cm"># hmac_secret: "platform_broker_shared_token"</span></pre>
-        </div>
-
-        <div class="code-block" style="margin-top:12px">
-          <pre>$ <span class="kw">./uploadbroker</span>
-$ <span class="kw">curl</span> -F <span class="str">"file=@photo.png"</span> <span class="str">"http://127.0.0.1:9001/v1/upload"</span>
-{<span class="str">"code"</span>:<span class="num">0</span>,<span class="str">"data"</span>:{<span class="str">"url"</span>:<span class="str">"https://..."</span>,<span class="str">"mimeType"</span>:<span class="str">"image/png"</span>}}
-$ <span class="kw">curl</span> <span class="str">"https://upload.example.com/tmp/..."</span> <span class="cm"># 读取文件</span></pre>
-        </div>
-      </div>
+      <div class="faq-summary"><strong>一句话</strong>：RustFS 优化的是存储性能，uploadbroker 优化的是业务安全与灵活性——不同层次的差异化价值。</div>
     </div>
   </div>
 </section>
 
 <footer>
-  <div class="container">
-    <div class="left">uploadbroker &middot; MIT License</div>
-    <div class="right">
-      <a href="https://github.com/doc-war/uploadbroker" target="_blank" rel="noopener">GitHub</a>
-      <a href="#" style="display:inline-flex;align-items:center;gap:4px">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-        回到顶部
-      </a>
+  <div class="wrap">
+    <div>
+      <span class="mono">UploadBroker</span>·<a href="https://doc-war.com" rel="noopener" target="_blank" class="mono" style="font-size:.84rem;">doc-war.com</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a href="https://github.com/doc-war/uploadbroker" rel="noopener" target="_blank" class="mono" style="font-size:.84rem;">GitHub ↗</a>
+      <span class="footer__license">MIT LICENSE</span>
     </div>
   </div>
 </footer>
 
 <script>
 (function(){
+  /* ---------- scroll reveal ---------- */
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var blocks = document.querySelectorAll('.reveal');
+  if (reduced || !('IntersectionObserver' in window)) {
+    blocks.forEach(function(b){ b.classList.add('is-visible'); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    blocks.forEach(function(b){ io.observe(b); });
+  }
+
+  /* ---------- FAQ tabs ---------- */
   var tabs = document.querySelectorAll('.faq-tab');
   var contents = {
     minio: document.getElementById('faqMinio'),
@@ -396,5 +427,6 @@ $ <span class="kw">curl</span> <span class="str">"https://upload.example.com/tmp
   });
 })();
 </script>
+
 </body>
 </html>

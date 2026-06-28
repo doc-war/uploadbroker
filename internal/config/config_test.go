@@ -147,9 +147,27 @@ func TestLoadMissingBaseURL(t *testing.T) {
 func TestLoadMissingSalts(t *testing.T) {
 	yaml := `base_url: https://example.com`
 	path := writeConfig(t, yaml)
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if len(cfg.URLBlake2bSalts) != 1 || cfg.URLBlake2bSalts[0] != "" {
+		t.Fatalf("expected [\"\"], got %v", cfg.URLBlake2bSalts)
+	}
+}
+
+func TestLoadTooManySalts(t *testing.T) {
+	yaml := `
+base_url: https://example.com
+url_blake2b_salts:
+  - salt1
+  - salt2
+  - salt3
+`
+	path := writeConfig(t, yaml)
 	_, err := Load(path)
 	if err == nil {
-		t.Fatal("expected error for missing salts")
+		t.Fatal("expected error for >2 salts")
 	}
 }
 

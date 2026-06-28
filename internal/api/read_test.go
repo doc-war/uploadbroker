@@ -169,11 +169,15 @@ func TestReadExpired(t *testing.T) {
 func TestReadInvalidURL(t *testing.T) {
 	_, _, _, h := setupReadTest(t)
 
+	key := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	expire := time.Now().Add(24 * time.Hour).Unix()
+
 	tests := []string{
 		"/tmp/abc",
 		"/tmp/123/ab/key/token.jpg",
 		"/tmp/123/ab/",
 		"/invalid",
+		"/tmp/" + itoa(expire) + "/ZZ/" + key + "/token.png",
 	}
 
 	for _, url := range tests {

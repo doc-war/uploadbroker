@@ -33,6 +33,10 @@ type Limits struct {
 
 type SizeBytes int64
 
+func (s SizeBytes) String() string {
+	return fmt.Sprintf("%dMB", int64(s)/(1024*1024))
+}
+
 func (s *SizeBytes) UnmarshalYAML(value *yaml.Node) error {
 	var raw string
 	if err := value.Decode(&raw); err != nil {
@@ -116,7 +120,10 @@ func (c *Config) fillDefaults() error {
 		}
 	}
 	if len(c.URLBlake2bSalts) == 0 {
-		return fmt.Errorf("url_blake2b_salts must have at least one salt")
+		c.URLBlake2bSalts = []string{""}
+	}
+	if len(c.URLBlake2bSalts) > 2 {
+		return fmt.Errorf("at most 2 url_blake2b_salts allowed")
 	}
 	if c.BaseURL == "" {
 		return fmt.Errorf("base_url is required")

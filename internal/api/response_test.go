@@ -57,6 +57,23 @@ func TestWriteError500(t *testing.T) {
 	}
 }
 
+func TestWriteError404(t *testing.T) {
+	w := httptest.NewRecorder()
+	writeError(w, 40401, "not found")
+
+	if w.Code != http.StatusNotFound {
+		t.Fatalf("status = %d, want 404", w.Code)
+	}
+
+	var resp Response
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("Unmarshal: %v", err)
+	}
+	if resp.Code != 40401 {
+		t.Fatalf("code = %d, want 40401", resp.Code)
+	}
+}
+
 func TestWriteSuccess(t *testing.T) {
 	w := httptest.NewRecorder()
 	data := map[string]string{"key": "value"}

@@ -73,36 +73,36 @@ timestamp: <unix> (可选)
 ## 配置
 
 ```yaml
-listen: 127.0.0.1:9001
-base_url: https://upload.example.com
-url_blake2b_salts:
+listen: 127.0.0.1:9001                # 监听地址，端口传0表示自动选择空闲端口
+base_url: https://upload.example.com  # 注入对外资源 URL 前缀（必填）（部署环境依赖）
+url_blake2b_salts:                    # URL 签名盐值（最多 2 个，省略则使用空盐）
   - current-salt
-  - previous-salt
-url_prefix: tmp
-metadata_db: ./data/broker.db
-cleanup_interval: 10m
-default_ttl: 24h
-hmac_secret: ""
+url_prefix: tmp                       # URL 路径前缀（默认 tmp）
+metadata_db: ./data/broker.db         # SQLite 数据库路径（默认 ./data/broker.db）
+cleanup_interval: 10m                 # 过期资源清理间隔（默认 10m）
+default_ttl: 24h                      # 默认 TTL（默认 24h）
+hmac_secret: ""                       # 可选，上传 HMAC 签名密钥
 
 limits:
-  image: 2MB
-  audio: 3MB
-  video: 10MB
-  document: 2MB
+  image: 2MB                          # 图片最大体积（单位 MB，仅支持整数，默认 2MB）
+  audio: 3MB                          # 音频（单位 MB，默认 3MB）
+  video: 10MB                         # 视频（单位 MB，默认 10MB）
+  document: 2MB                       # 文档（单位 MB，默认 2MB）
 
 storage:
-  upload_driver: local
+  upload_driver: local                # 写入使用的驱动名称
   drivers:
     local:
-      provider: local
-      root: ./data/objects
+      provider: local                 # 本地文件系统
+      root: ./data/objects            # 存储根目录
     aws:
-      provider: s3
+      provider: s3                    # S3 兼容服务（AWS/OSS/R2/MinIO）
       endpoint: s3.ap-northeast-1.amazonaws.com
       bucket: my-bucket
       region: ap-northeast-1
       access_key_id: xxx
       secret_access_key: xxx
+      # secure: true                  # HTTPS（默认 true，false=HTTP）
 ```
 
 ### 存储驱动

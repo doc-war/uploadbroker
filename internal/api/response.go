@@ -21,6 +21,8 @@ func writeError(w http.ResponseWriter, code int, msg string) {
 	httpStatus := http.StatusOK
 	if code >= 50000 {
 		httpStatus = http.StatusInternalServerError
+	} else if code >= 40400 && code < 40500 {
+		httpStatus = http.StatusNotFound
 	} else if code >= 40000 {
 		httpStatus = http.StatusBadRequest
 	} else if code == 40100 {

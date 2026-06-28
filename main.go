@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -33,7 +34,7 @@ func main() {
 		log.Fatalf("open log file: %v", err)
 	}
 	defer logFile.Close()
-	log.SetOutput(logFile)
+	log.SetOutput(io.MultiWriter(logFile, os.Stdout))
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -62,7 +63,7 @@ func main() {
 	log.Printf("  cleanup_interval: %v", cfg.CleanupInterval)
 	log.Printf("  metadata_db: %s", cfg.MetadataDB)
 	log.Printf("  upload_driver: %s", cfg.Storage.UploadDriver)
-	log.Printf("  limits: image=%v audio=%v video=%v", cfg.Limits.Image, cfg.Limits.Audio, cfg.Limits.Video)
+	log.Printf("  limits: image=%v audio=%v video=%v document=%v", cfg.Limits.Image, cfg.Limits.Audio, cfg.Limits.Video, cfg.Limits.Document)
 	if cfg.HMACSecret != "" {
 		log.Printf("  hmac_secret: <configured>")
 	}

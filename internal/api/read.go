@@ -89,8 +89,13 @@ func parseURLPath(urlPath string) (key string, expireUnix int64, ext string, tok
 	}
 
 	expireStr := parts[1]
+	shard := parts[2]
 	key = parts[3]
 	tokenExt := parts[4]
+
+	if len(key) < 2 || shard != key[:2] {
+		return "", 0, "", "", fmt.Errorf("shard mismatch")
+	}
 
 	expireUnix, e := strconv.ParseInt(expireStr, 10, 64)
 	if e != nil {

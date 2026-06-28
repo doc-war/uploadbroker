@@ -31,10 +31,6 @@ func BuildURL(baseURL, urlPrefix, key, ext string, expire int64, salt string) st
 	return fmt.Sprintf("%s/%s/%d/%s/%s/%s%s", baseURL, urlPrefix, expire, shard, key, token, ext)
 }
 
-func ExtractKeyFromPath(path string) (string, int64, error) {
-	return "", 0, fmt.Errorf("not implemented")
-}
-
 func HMACSign(secret, msg string) string {
 	mac := hmac.New(sha256.New, []byte(secret))
 	mac.Write([]byte(msg))
@@ -45,7 +41,7 @@ func VerifyHMAC(secret, msg, sign string) bool {
 	return hmac.Equal([]byte(HMACSign(secret, msg)), []byte(sign))
 }
 
-var formatInt64 = func(n int64) string {
+func formatInt64(n int64) string {
 	t := time.Unix(n, 0).UTC()
 	return t.Format("20060102150405")
 }

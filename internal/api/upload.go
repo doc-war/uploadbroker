@@ -16,13 +16,29 @@ import (
 )
 
 type UploadHandler struct {
-	cfg     *config.Config
-	store   *metadata.Store
-	drivers map[string]storage.Storage
+	cfg           *config.Config
+	store         *metadata.Store
+	drivers       map[string]storage.Storage
+	maxFormMemory int64
 }
 
 func NewUploadHandler(cfg *config.Config, store *metadata.Store, drivers map[string]storage.Storage) *UploadHandler {
-	return &UploadHandler{cfg: cfg, store: store, drivers: drivers}
+	maxLimit := int64(cfg.Limits.Image)
+	if int64(cfg.Limits.Audio) > maxLimit {
+		maxLimit = int64(cfg.Limits.Audio)
+	}
+	if int64(cfg.Limits.Video) > maxLimit {
+		maxLimit = int64(cfg.Limits.Video)
+	}
+	if int64(cfg.Limits.Document) > maxLimit {
+		maxLimit = int64(cfg.Limits.Document)
+	}
+	return &UploadHandler{
+		cfg:           cfg,
+		store:         store,
+		drivers:       drivers,
+		maxFormMemory: maxLimit + (1 << 20),
+	}
 }
 
 func (h *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +52,7 @@ func (h *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseMultipartForm(32 << 20); err != nil {
+	if err := r.ParseMultipartForm(h.maxFormMemory); err != nil {
 		writeError(w, 40001, "invalid multipart form")
 		return
 	}
