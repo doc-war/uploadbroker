@@ -38,6 +38,9 @@ data/objects/*
 *.swo
 *~
 
+# Deploy build artifacts
+deploy/
+
 # OS
 .DS_Store
 Thumbs.db

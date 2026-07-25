@@ -45,7 +45,7 @@ func main() {
 		}
 	}()
 
-	cfgPath := flag.String("config", "./uploadBroker.yaml", "path to configuration file")
+	cfgPath := flag.String("config", "./uploadbroker.yaml", "path to configuration file")
 	flag.Parse()
 
 	cfg, err := config.Load(*cfgPath)
