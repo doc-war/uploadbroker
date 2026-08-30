@@ -102,11 +102,35 @@ func TestDetectWAV(t *testing.T) {
 	}
 	ti, ok := Detect(b)
 	if !ok {
-		t.Log("WAV detection may vary by platform, skip")
-		return
+		t.Fatal("should detect WAV")
+	}
+	if ti.MIME != "audio/wav" {
+		t.Fatalf("expected audio/wav, got %s", ti.MIME)
 	}
 	if ti.Category != "audio" || ti.Extension != ".wav" {
-		t.Logf("WAV detected as %s/%s", ti.MIME, ti.Extension)
+		t.Fatalf("WAV detected as %s/%s", ti.MIME, ti.Extension)
+	}
+}
+
+func TestDetectWAVNotWebpOrAVI(t *testing.T) {
+	// RIFF with WEBP subtype must NOT be detected as audio/wav
+	webp := []byte{0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50}
+	for len(webp) < 512 {
+		webp = append(webp, 0)
+	}
+	ti, ok := Detect(webp)
+	if ok && ti.MIME == "audio/wav" {
+		t.Fatal("RIFF/WEBP must not be detected as audio/wav")
+	}
+
+	// RIFF with AVI subtype must not be detected as audio/wav
+	avi := []byte{0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x41, 0x56, 0x49, 0x20}
+	for len(avi) < 512 {
+		avi = append(avi, 0)
+	}
+	ti, ok = Detect(avi)
+	if ok && ti.MIME == "audio/wav" {
+		t.Fatal("RIFF/AVI must not be detected as audio/wav")
 	}
 }
 

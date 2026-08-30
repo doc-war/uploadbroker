@@ -39,6 +39,10 @@ func Detect(data []byte) (*TypeInfo, bool) {
 	if len(data) == 0 {
 		return nil, false
 	}
+	if len(data) >= 12 && string(data[0:4]) == "RIFF" && string(data[8:12]) == "WAVE" {
+		ti := allowed["audio/wav"]
+		return &ti, true
+	}
 	raw := http.DetectContentType(data)
 	mediatype, _, err := mime.ParseMediaType(raw)
 	if err != nil {
