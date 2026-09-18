@@ -237,6 +237,41 @@ func TestGetRecordCount(t *testing.T) {
 	}
 }
 
+func TestCountActive(t *testing.T) {
+	s := newTestStore(t)
+
+	now := time.Now().Unix()
+
+	// active: expire in the future
+	if err := s.Insert(makeRecord("a1", 3600)); err != nil {
+		t.Fatalf("Insert a1: %v", err)
+	}
+	// expired: already past
+	if err := s.Insert(makeRecord("a2", -3600)); err != nil {
+		t.Fatalf("Insert a2: %v", err)
+	}
+	// boundary: expires exactly at now, treated as expired
+	if err := s.Insert(makeRecord("a3", 0)); err != nil {
+		t.Fatalf("Insert a3: %v", err)
+	}
+
+	count, err := s.CountActive(now)
+	if err != nil {
+		t.Fatalf("CountActive: %v", err)
+	}
+	if count != 1 {
+		t.Fatalf("expected 1 active object, got %d", count)
+	}
+
+	total, err := s.GetRecordCount()
+	if err != nil {
+		t.Fatalf("GetRecordCount: %v", err)
+	}
+	if total != 3 {
+		t.Fatalf("expected 3 total objects, got %d", total)
+	}
+}
+
 func TestHealth(t *testing.T) {
 	s := newTestStore(t)
 	if err := s.Health(); err != nil {

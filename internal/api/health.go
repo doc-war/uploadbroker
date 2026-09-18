@@ -42,13 +42,19 @@ func (h *HealthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		httpStatus = http.StatusServiceUnavailable
 	}
 
+	activeCount := -1
+	if n, err := h.store.CountActive(time.Now().Unix()); err == nil {
+		activeCount = n
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(httpStatus)
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"version": h.cfgVersion,
-		"status":  status,
-		"storage": allDriverStatus,
-		"sqlite":  storeStatus,
-		"time":    time.Now().UTC().Format(time.RFC3339),
+		"version":    h.cfgVersion,
+		"status":     status,
+		"storage":    allDriverStatus,
+		"sqlite":     storeStatus,
+		"activeCount": activeCount,
+		"time":       time.Now().UTC().Format(time.RFC3339),
 	})
 }

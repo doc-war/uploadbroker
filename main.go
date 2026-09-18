@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"runtime/debug"
 	"syscall"
+	"time"
 
 	"github.com/doc-war/uploadbroker/internal/api"
 	"github.com/doc-war/uploadbroker/internal/cleanup"
@@ -108,22 +109,30 @@ func main() {
 
 	go cleanup.New(cfg, store, drivers).Start(ctx)
 
-	go func() {
-		sigCh := make(chan os.Signal, 1)
-		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-		<-sigCh
-		cancel()
-	}()
-
 	listener, handler, err := api.StartServer(cfg, store, drivers)
 	if err != nil {
 		log.Fatalf("server: %v", err)
 	}
 
+	srv := &http.Server{Handler: handler}
+
+	go func() {
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+		<-sigCh
+		cancel()
+
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer shutdownCancel()
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			log.Printf("shutdown: %v", err)
+		}
+	}()
+
 	addr := listener.Addr().String()
 	os.WriteFile(".port", []byte(addr+"\n"), 0644)
 	log.Printf("listening on %s", addr)
-	if err := http.Serve(listener, handler); err != nil {
+	if err := srv.Serve(listener); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("serve: %v", err)
 	}
 }

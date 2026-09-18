@@ -137,3 +137,9 @@ func (s *Store) GetRecordCount() (int, error) {
 	err := s.db.QueryRow("SELECT COUNT(*) FROM objects").Scan(&count)
 	return count, err
 }
+
+func (s *Store) CountActive(now int64) (int, error) {
+	var count int
+	err := s.db.QueryRow("SELECT COUNT(*) FROM objects WHERE expire_at > ?", now).Scan(&count)
+	return count, err
+}

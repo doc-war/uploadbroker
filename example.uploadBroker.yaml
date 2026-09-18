@@ -10,10 +10,10 @@ default_ttl: 24h
 hmac_secret: ""
 
 limits:
-  image: 2MB
-  audio: 3MB
-  video: 10MB
-  document: 2MB
+  image: 2MB    # 默认2M
+  audio: 3MB   # 默认3M
+  video: 10MB   # 默认10M
+  document: 2MB # 默认2M
 
 # 存储驱动配置
 # upload_driver 决定写入用哪个 driver 名称，读取按 rec.Backend 自动路由。

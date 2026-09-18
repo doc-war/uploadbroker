@@ -62,6 +62,9 @@ func TestHealthOK(t *testing.T) {
 	if body["sqlite"] != "ok" {
 		t.Fatalf("sqlite = %v, want ok", body["sqlite"])
 	}
+	if body["activeCount"] != float64(0) {
+		t.Fatalf("activeCount = %v, want 0", body["activeCount"])
+	}
 	if _, ok := body["time"]; !ok {
 		t.Fatal("time field missing")
 	}
