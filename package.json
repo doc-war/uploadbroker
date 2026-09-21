@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "deploy": "node deploy.js"
+    "deploy": "opendeploy deploy"
   },
   "remark": [
     "npm run deploy    # 测试 + 交叉编译 + 部署到服务器"
