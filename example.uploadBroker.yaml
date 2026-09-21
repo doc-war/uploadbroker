@@ -7,13 +7,17 @@ metadata_db: ./data/broker.db
 cleanup_interval: 10m
 default_ttl: 24h
 
+# 是否允许浏览器跨域调用（CORS），默认 true（未配置时开启）
+cors: true
+
 hmac_secret: ""
 
 limits:
-  image: 2MB    # 默认2M
-  audio: 3MB   # 默认3M
-  video: 10MB   # 默认10M
-  document: 2MB # 默认2M
+  image: 3MB    # 图片最大体积（单位 MB，仅支持整数，默认 3MB）
+  audio: 5MB    # 音频（单位 MB，默认 5MB）
+  video: 10MB   # 视频（单位 MB，默认 10MB）
+  document: 5MB # 文档（单位 MB，默认 5MB）
+  archive: 30MB # 压缩包 zip/7z/rar 默认30M
 
 # 存储驱动配置
 # upload_driver 决定写入用哪个 driver 名称，读取按 rec.Backend 自动路由。

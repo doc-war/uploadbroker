@@ -51,8 +51,11 @@ url_blake2b_salts:
 	if cfg.DefaultTTL != 24*time.Hour {
 		t.Fatalf("DefaultTTL = %v", cfg.DefaultTTL)
 	}
-	if int64(cfg.Limits.Image) != int64(2<<20) {
-		t.Fatalf("Limits.Image = %d, want %d", cfg.Limits.Image, 2<<20)
+	if int64(cfg.Limits.Image) != int64(3<<20) {
+		t.Fatalf("Limits.Image = %d, want %d", cfg.Limits.Image, 3<<20)
+	}
+	if int64(cfg.Limits.Archive) != int64(30<<20) {
+		t.Fatalf("Limits.Archive = %d, want %d", cfg.Limits.Archive, 30<<20)
 	}
 	if cfg.Storage.UploadDriver != "local" {
 		t.Fatalf("Storage.UploadDriver = %s", cfg.Storage.UploadDriver)
@@ -186,6 +189,38 @@ func TestLoadFileNotFound(t *testing.T) {
 	if cfg.BaseURL != "http://localhost" {
 		t.Fatalf("BaseURL = %s, want http://localhost", cfg.BaseURL)
 	}
+	if !cfg.CORSEnabled() {
+		t.Fatal("CORS should default to enabled")
+	}
+}
+
+func TestCORSConfig(t *testing.T) {
+	// 未配置 → 默认允许
+	cfg, err := Load(writeConfig(t, "base_url: https://x.com\nurl_blake2b_salts: [s]"))
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if !cfg.CORSEnabled() {
+		t.Fatal("CORS should default to enabled when not configured")
+	}
+
+	// 显式 false → 关闭
+	cfg, err = Load(writeConfig(t, "base_url: https://x.com\nurl_blake2b_salts: [s]\ncors: false"))
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if cfg.CORSEnabled() {
+		t.Fatal("CORS should be disabled when cors: false")
+	}
+
+	// 显式 true → 开启
+	cfg, err = Load(writeConfig(t, "base_url: https://x.com\nurl_blake2b_salts: [s]\ncors: true"))
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if !cfg.CORSEnabled() {
+		t.Fatal("CORS should be enabled when cors: true")
+	}
 }
 
 func TestLoadInvalidYAML(t *testing.T) {
@@ -238,12 +273,15 @@ func TestParseSizeInvalid(t *testing.T) {
 }
 
 func TestSizeBytesUnmarshal(t *testing.T) {
-	path := writeConfig(t, "base_url: https://x.com\nurl_blake2b_salts: [s]\nlimits:\n  image: 5MB\n  audio: 3MB\n  video: 10MB")
+	path := writeConfig(t, "base_url: https://x.com\nurl_blake2b_salts: [s]\nlimits:\n  image: 5MB\n  audio: 3MB\n  video: 10MB\n  archive: 60MB")
 	cfg, err := Load(path)
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
 	if int64(cfg.Limits.Image) != int64(5*1024*1024) {
 		t.Fatalf("Image limit = %d", cfg.Limits.Image)
+	}
+	if int64(cfg.Limits.Archive) != int64(60*1024*1024) {
+		t.Fatalf("Archive limit = %d", cfg.Limits.Archive)
 	}
 }

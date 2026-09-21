@@ -33,6 +33,9 @@ func NewUploadHandler(cfg *config.Config, store *metadata.Store, drivers map[str
 	if int64(cfg.Limits.Document) > maxLimit {
 		maxLimit = int64(cfg.Limits.Document)
 	}
+	if int64(cfg.Limits.Archive) > maxLimit {
+		maxLimit = int64(cfg.Limits.Archive)
+	}
 	return &UploadHandler{
 		cfg:           cfg,
 		store:         store,
@@ -75,7 +78,7 @@ func (h *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mimeInfo, ok := mime.Detect(data)
+	mimeInfo, ok := mime.Detect(header.Filename, data)
 	if !ok {
 		writeError(w, 40003, "unsupported mime")
 		return
@@ -169,6 +172,8 @@ func (h *UploadHandler) maxSize(category string) int64 {
 		return int64(h.cfg.Limits.Video)
 	case "document":
 		return int64(h.cfg.Limits.Document)
+	case "archive":
+		return int64(h.cfg.Limits.Archive)
 	default:
 		return int64(h.cfg.Limits.Image)
 	}

@@ -65,10 +65,13 @@ timestamp: <unix> (可选)
 
 | 类型 | MIME | 默认限制 |
 |---|---|---|
-| 图片 | png / jpeg / webp | 2 MB |
-| 音频 | mp3 / wav / m4a / aac | 3 MB |
+| 图片 | png / jpeg / webp | 3 MB |
+| 音频 | mp3 / wav / m4a / aac | 5 MB |
 | 视频 | mp4 / webm | 10 MB |
-| 文档 | txt / pdf | 2 MB |
+| 文档 | txt / md / json / yaml / yml / toml / ini / conf / sh / bash / go / js / ts / py / java / c / h / cpp / hpp / rs / rb / php / sql / csv / css / pdf | 5 MB |
+| 压缩包 | zip / 7z / rar | 30 MB |
+
+文档类为纯文本内容，按原始扩展名保留（不再退化为 .txt）；`.html/.htm/.svg/.xml` 为危险扩展名，检测为纯文本时拒绝上传（防存储型 XSS）。
 
 ## 配置
 
@@ -82,12 +85,14 @@ metadata_db: ./data/broker.db         # SQLite 数据库路径（默认 ./data/b
 cleanup_interval: 10m                 # 过期资源清理间隔（默认 10m）
 default_ttl: 24h                      # 默认 TTL（默认 24h）
 hmac_secret: ""                       # 可选，上传 HMAC 签名密钥
+cors: true                            # 是否允许浏览器跨域调用（默认 true）
 
 limits:
-  image: 2MB                          # 图片最大体积（单位 MB，仅支持整数，默认 2MB）
-  audio: 3MB                          # 音频（单位 MB，默认 3MB）
+  image: 2MB                          # 图片最大体积（单位 MB，仅支持整数，默认 3MB）
+  audio: 3MB                          # 音频（单位 MB，默认 5MB）
   video: 10MB                         # 视频（单位 MB，默认 10MB）
-  document: 2MB                       # 文档（单位 MB，默认 2MB）
+  document: 2MB                       # 文档（单位 MB，默认 5MB）
+  archive: 30MB                       # 压缩包 zip/7z/rar（单位 MB，默认 30MB）
 
 storage:
   upload_driver: local                # 写入使用的驱动名称

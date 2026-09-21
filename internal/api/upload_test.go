@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/doc-war/uploadbroker/internal/config"
@@ -39,9 +40,11 @@ func newTestFixture(t *testing.T) (*config.Config, *metadata.Store, map[string]s
 		MetadataDB:      dbPath,
 		DefaultTTL:      86400000000000,
 		Limits: config.Limits{
-			Image: config.SizeBytes(2 << 20),
-			Audio: config.SizeBytes(3 << 20),
-			Video: config.SizeBytes(10 << 20),
+			Image:    config.SizeBytes(2 << 20),
+			Audio:    config.SizeBytes(3 << 20),
+			Video:    config.SizeBytes(10 << 20),
+			Document: config.SizeBytes(2 << 20),
+			Archive:  config.SizeBytes(30 << 20),
 		},
 		Version: "1.0.0",
 		Storage: config.StorageConfig{
@@ -256,6 +259,84 @@ func TestUploadWithExpires(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &resp)
 	if resp.Code != 0 {
 		t.Fatalf("code = %d, want 0", resp.Code)
+	}
+}
+
+func TestUploadZip(t *testing.T) {
+	cfg, store, drv, _ := newTestFixture(t)
+	h := NewUploadHandler(cfg, store, drv)
+
+	// PK\x03\x04 zip magic + padding
+	data := []byte{0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x00, 0x00}
+	for len(data) < 100 {
+		data = append(data, 0)
+	}
+	r := multipartUpload(t, data, "archive.zip", "")
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, r)
+
+	var resp struct {
+		Code int `json:"code"`
+		Data struct {
+			URL      string `json:"url"`
+			MimeType string `json:"mimeType"`
+		} `json:"data"`
+	}
+	json.Unmarshal(w.Body.Bytes(), &resp)
+	if resp.Code != 0 {
+		t.Fatalf("code = %d, want 0, body: %s", resp.Code, w.Body.String())
+	}
+	if resp.Data.MimeType != "application/zip" {
+		t.Fatalf("mimeType = %s, want application/zip", resp.Data.MimeType)
+	}
+	if !strings.HasSuffix(resp.Data.URL, ".zip") {
+		t.Fatalf("url = %s, want .zip suffix", resp.Data.URL)
+	}
+}
+
+func TestUploadMarkdown(t *testing.T) {
+	cfg, store, drv, _ := newTestFixture(t)
+	h := NewUploadHandler(cfg, store, drv)
+
+	// markdown 应保留 .md 扩展名而不是退化为 .txt
+	r := multipartUpload(t, []byte("# Title\n\nsome content\n"), "README.md", "")
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, r)
+
+	var resp struct {
+		Code int `json:"code"`
+		Data struct {
+			URL      string `json:"url"`
+			MimeType string `json:"mimeType"`
+		} `json:"data"`
+	}
+	json.Unmarshal(w.Body.Bytes(), &resp)
+	if resp.Code != 0 {
+		t.Fatalf("code = %d, want 0, body: %s", resp.Code, w.Body.String())
+	}
+	if resp.Data.MimeType != "text/markdown" {
+		t.Fatalf("mimeType = %s, want text/markdown", resp.Data.MimeType)
+	}
+	if !strings.HasSuffix(resp.Data.URL, ".md") {
+		t.Fatalf("url = %s, want .md suffix", resp.Data.URL)
+	}
+}
+
+func TestUploadDangerousHTMLRejected(t *testing.T) {
+	cfg, store, drv, _ := newTestFixture(t)
+	h := NewUploadHandler(cfg, store, drv)
+
+	// 纯文本内容 + .html 扩展名：检测为 text/plain 但危险扩展名应被拒绝（防 XSS）
+	r := multipartUpload(t, []byte("plain text but html name"), "page.html", "")
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, r)
+
+	var resp struct {
+		Code int `json:"code"`
+	}
+	json.Unmarshal(w.Body.Bytes(), &resp)
+	if resp.Code != 40003 {
+		t.Fatalf("code = %d, want 40003 (html rejected), body: %s", resp.Code, w.Body.String())
 	}
 }
 

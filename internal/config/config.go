@@ -20,8 +20,17 @@ type Config struct {
 	CleanupInterval time.Duration    `yaml:"cleanup_interval"`
 	DefaultTTL      time.Duration    `yaml:"default_ttl"`
 	Limits          Limits           `yaml:"limits"`
+	CORS            *bool            `yaml:"cors"`
 	Storage         StorageConfig    `yaml:"storage"`
 	Version         string           `yaml:"-"`
+}
+
+// CORSEnabled 返回是否允许跨域。未配置（nil）时默认允许。
+func (c *Config) CORSEnabled() bool {
+	if c.CORS == nil {
+		return true
+	}
+	return *c.CORS
 }
 
 type Limits struct {
@@ -29,6 +38,7 @@ type Limits struct {
 	Audio    SizeBytes `yaml:"audio"`
 	Video    SizeBytes `yaml:"video"`
 	Document SizeBytes `yaml:"document"`
+	Archive  SizeBytes `yaml:"archive"`
 }
 
 type SizeBytes int64
@@ -107,16 +117,19 @@ func (c *Config) fillDefaults() error {
 		c.DefaultTTL = 24 * time.Hour
 	}
 	if c.Limits.Image == 0 {
-		c.Limits.Image = SizeBytes(2 << 20)
+		c.Limits.Image = SizeBytes(3 << 20)
 	}
 	if c.Limits.Audio == 0 {
-		c.Limits.Audio = SizeBytes(3 << 20)
+		c.Limits.Audio = SizeBytes(5 << 20)
 	}
 	if c.Limits.Video == 0 {
 		c.Limits.Video = SizeBytes(10 << 20)
 	}
 	if c.Limits.Document == 0 {
-		c.Limits.Document = SizeBytes(2 << 20)
+		c.Limits.Document = SizeBytes(5 << 20)
+	}
+	if c.Limits.Archive == 0 {
+		c.Limits.Archive = SizeBytes(30 << 20)
 	}
 	if c.Storage.UploadDriver == "" {
 		c.Storage.UploadDriver = "local"

@@ -18,6 +18,9 @@ func StartServer(cfg *config.Config, store *metadata.Store, drivers map[string]s
 	mux.Handle("/tmp/", NewReadHandler(cfg, store, drivers))
 
 	handler := LoggingMiddleware(mux)
+	if cfg.CORSEnabled() {
+		handler = CORSMiddleware(handler)
+	}
 
 	listener, err := net.Listen("tcp", cfg.Listen)
 	if err != nil {
