@@ -6,7 +6,9 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
+	"time"
 
 	"github.com/doc-war/uploadbroker/internal/metadata"
 	"github.com/doc-war/uploadbroker/internal/storage"
@@ -65,8 +67,18 @@ func TestHealthOK(t *testing.T) {
 	if body["activeCount"] != float64(0) {
 		t.Fatalf("activeCount = %v, want 0", body["activeCount"])
 	}
-	if _, ok := body["time"]; !ok {
-		t.Fatal("time field missing")
+	// time 应为二进制修改时间（部署落盘时间），格式 RFC3339
+	exe, err := os.Executable()
+	if err != nil {
+		t.Fatalf("os.Executable: %v", err)
+	}
+	info, err := os.Stat(exe)
+	if err != nil {
+		t.Fatalf("os.Stat: %v", err)
+	}
+	wantTime := info.ModTime().UTC().Format(time.RFC3339)
+	if got, ok := body["time"].(string); !ok || got != wantTime {
+		t.Fatalf("time = %v, want %s", body["time"], wantTime)
 	}
 }
 
