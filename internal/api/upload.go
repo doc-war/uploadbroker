@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -55,7 +56,15 @@ func (h *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 体积前置拦截：超过允许上限直接拒绝，避免超大 body 读入内存
+	r.Body = http.MaxBytesReader(w, r.Body, h.maxFormMemory)
+
 	if err := r.ParseMultipartForm(h.maxFormMemory); err != nil {
+		var maxErr *http.MaxBytesError
+		if errors.As(err, &maxErr) {
+			writeError(w, 40004, fmt.Sprintf("max size %d bytes", h.maxFormMemory))
+			return
+		}
 		writeError(w, 40001, "invalid multipart form")
 		return
 	}

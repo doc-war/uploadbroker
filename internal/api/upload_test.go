@@ -228,6 +228,30 @@ func TestUploadFileTooLarge(t *testing.T) {
 	}
 }
 
+func TestUploadBodyTooLarge(t *testing.T) {
+	cfg, store, drv, _ := newTestFixture(t)
+	// 调小所有限制，使 maxFormMemory 接近 1MB，便于构造超限 body
+	cfg.Limits.Image = config.SizeBytes(100)
+	cfg.Limits.Audio = config.SizeBytes(100)
+	cfg.Limits.Video = config.SizeBytes(100)
+	cfg.Limits.Document = config.SizeBytes(100)
+	cfg.Limits.Archive = config.SizeBytes(100)
+	h := NewUploadHandler(cfg, store, drv)
+
+	// 2MB 文件 > maxFormMemory（约 1MB），应被 MaxBytesReader 前置拦截
+	r := multipartUpload(t, bytes.Repeat([]byte("x"), 2<<20), "big.txt", "")
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, r)
+
+	var resp struct {
+		Code int `json:"code"`
+	}
+	json.Unmarshal(w.Body.Bytes(), &resp)
+	if resp.Code != 40004 {
+		t.Fatalf("code = %d, want 40004 (MaxBytesReader), body: %s", resp.Code, w.Body.String())
+	}
+}
+
 func TestUploadInvalidExpires(t *testing.T) {
 	cfg, store, drv, _ := newTestFixture(t)
 	h := NewUploadHandler(cfg, store, drv)

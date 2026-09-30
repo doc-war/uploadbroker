@@ -114,7 +114,13 @@ func main() {
 		log.Fatalf("server: %v", err)
 	}
 
-	srv := &http.Server{Handler: handler}
+	srv := &http.Server{
+		Handler:           handler,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       60 * time.Second,
+		WriteTimeout:      60 * time.Second,
+		IdleTimeout:       90 * time.Second,
+	}
 
 	go func() {
 		sigCh := make(chan os.Signal, 1)
